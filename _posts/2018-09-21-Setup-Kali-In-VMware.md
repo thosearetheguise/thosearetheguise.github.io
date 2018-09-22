@@ -99,4 +99,12 @@ If any dialogs appear, press _[space]_ to go with the default values.
 
 ![initial-config-dialogs.png]({{site.baseurl}}/Images/initial-config-dialogs.png)
 
+Once complete, reboot the VM to ensure Kernel updates are also installed.
+
+### Installing VMware Tools
+
+The VMware tools allow better Host-Guest interactions, including copy/paste, drag and drop file transfers and shared folders etc.
+
+To install VMware Tools click Player > Manage > Reinstall VMware Tools from the guest window:
+
 
