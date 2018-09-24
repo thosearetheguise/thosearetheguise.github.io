@@ -103,4 +103,12 @@ Once complete, reboot the VM to ensure Kernel updates are also installed.
 
 The VMware tools allow better Host-Guest interactions, including copy/paste, drag and drop file transfers and shared folders etc.
 
-To install VMware Tools click Player > Manage > Reinstall VMware Tools from the guest window:
+If (like me) you have a laptop or desktop without a CD drive you might run into the following error:
+
+![no-disk-drive.png]({{site.baseurl}}/Images/no-disk-drive.png)
+
+When this happens, you can mount the `.iso` file directly. Shut down the guest VM, then right-click it and select settings. Click the CD/DVD (IDE) device, and select the `Use ISO image file` radio. Browse to  the location you installed VMware Workstation and select the `linux.iso` file. By default this file can be found at `C:\Program Files (x86)\VMware\VMware Player\linux.iso`
+
+![linux-tools-iso.png]({{site.baseurl}}/Images/linux-tools-iso.png)
+
+Boot up the VM and log in. To install VMware Tools click Player > Manage > Reinstall VMware Tools from the guest window:
