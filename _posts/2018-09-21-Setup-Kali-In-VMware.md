@@ -3,8 +3,6 @@ published: true
 author: jake
 date: 2018-09-22T00:00:01.000Z
 ---
-## Setup Kali in VMware
-
 We currently use Kali Linux for our pen testing and livestreams, Kali is a Linux distro targeted towards penetration testing, with hundreds of tools included by default. More information about the distro can be found on the [Kali Linux website](https://www.kali.org/).
 
 This post aims at guiding new users through the basic setup of a pre-configured Kali Virtual Machine (VM) on Windows using freely available tools.
@@ -34,7 +32,7 @@ VMware place the checksums under the _show more_ accordion:
 ![vmware-checksums.png]({{site.baseurl}}/Images/vmware-checksums.png)
 
 
-7-zip is able to verify checmsums of any file through a right-click context menu. Right-click a file and select **CRC SHA > [checksum type]** 
+7-zip is able to verify checkmsums of any file through a right-click context menu. Right-click a file and select **CRC SHA > [checksum type]** 
 
 ![Windows-checksum-menu.png]({{site.baseurl}}/Images/Windows-checksum-menu.png)
 
@@ -74,7 +72,7 @@ Before booting the up the VM for the first time it is always worth checking the 
 
 Once you are happy with the settings, click any of the play buttons to turn on the machine.
 
-The first time you boot up the VM there are a couple of house-cleaning tasks that should be performed.First boot can take some time while the VM configures itself, this is typically a once off thing and subsequent boots should be faster.
+The first time you boot up the VM there are a couple of house-cleaning tasks that should be performed. First boot can take some time while the VM configures itself, this is typically a once off thing and subsequent boots should be faster.
 
 The first time you log in the default credentials are **root:toor**. Once logged in the first thing we want to do is change those credentials to something more secure.
 
@@ -93,7 +91,7 @@ These commands can also be chained with _&&_ to perform all 3 tasks in one line:
 
     apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y
 
-Depending on your internet connaction and the resources given to the VM this could take a while first time through, the more frequently these commands are run, the quicker it will be.
+Depending on your internet connection and the resources given to the VM this could take a while first time through, the more frequently these commands are run, the quicker it will be.
 
 If any dialogs appear, press _[space]_ to go with the default values.
 
@@ -106,5 +104,3 @@ Once complete, reboot the VM to ensure Kernel updates are also installed.
 The VMware tools allow better Host-Guest interactions, including copy/paste, drag and drop file transfers and shared folders etc.
 
 To install VMware Tools click Player > Manage > Reinstall VMware Tools from the guest window:
-
-
