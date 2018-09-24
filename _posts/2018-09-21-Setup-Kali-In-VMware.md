@@ -111,4 +111,4 @@ When this happens, you can mount the `.iso` file directly. Shut down the guest V
 
 ![linux-tools-iso.png]({{site.baseurl}}/Images/linux-tools-iso.png)
 
-Boot up the VM and log in. To install VMware Tools click Player > Manage > Reinstall VMware Tools from the guest window:
+Boot up the VM and log in. Because we are 1337 h4x0rz we are not going to use the GUI to install the tools.
