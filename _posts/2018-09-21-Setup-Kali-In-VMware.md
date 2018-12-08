@@ -1,11 +1,18 @@
 ---
 published: true
 author: jake
-date: 2018-09-22T00:00:01.000Z
+date: 2018-09-22T00:00:02.000Z
 ---
 We currently use Kali Linux for our pen testing and livestreams, Kali is a Linux distro targeted towards penetration testing, with hundreds of tools included by default. More information about the distro can be found on the [Kali Linux website](https://www.kali.org/).
 
 This post aims at guiding new users through the basic setup of a pre-configured Kali Virtual Machine (VM) on Windows using freely available tools.
+
+1.[Prerequisite downloads](#Prerequisite-downloads)
+2.[Verify Download Integrity](#Verify-Download-Integrity)
+3.[Install VMware Workstation Player](#Install-VMware-Workstation-Player)
+4.[Import the Kali VM](#Import-the-Kali-VM)
+5.[First run](#First-run)
+6.[Installing VMware Tools](#Installing-VMware-Tools)
 
 ### Prerequisite downloads
 
@@ -112,3 +119,5 @@ When this happens, you can mount the `.iso` file directly. Shut down the guest V
 ![linux-tools-iso.png]({{site.baseurl}}/Images/linux-tools-iso.png)
 
 Boot up the VM and log in. Because we are 1337 h4x0rz we are not going to use the GUI to install the tools.
+
+
