@@ -7,12 +7,18 @@ We currently use Kali Linux for our pen testing and livestreams, Kali is a Linux
 
 This post aims at guiding new users through the basic setup of a pre-configured Kali Virtual Machine (VM) on Windows using freely available tools.
 
-1.[Prerequisite downloads](#Prerequisite-downloads)
-2.[Verify Download Integrity](#Verify-Download-Integrity)
-3.[Install VMware Workstation Player](#Install-VMware-Workstation-Player)
-4.[Import the Kali VM](#Import-the-Kali-VM)
-5.[First run](#First-run)
-6.[Installing VMware Tools](#Installing-VMware-Tools)
+1.[Prerequisite downloads](#prerequisite-downloads)
+
+2.[Verify Download Integrity](#verify-Download-Integrity)
+
+3.[Install VMware Workstation Player](#install-VMware-Workstation-Player)
+
+4.[Import the Kali VM](#import-the-Kali-VM)
+
+5.[First run](#first-run)
+
+6.[Installing VMware Tools](#installing-VMware-Tools)
+
 
 ### Prerequisite downloads
 
