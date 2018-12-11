@@ -88,11 +88,11 @@ Nice!
 
 So, now what we have is the log in credentials for a Service account, (SVC_).
 
-Kerberoasting is the process of cracking a Kerberos Ticket and rebuilding them to gain access to a targeted service. This allows us to take control of services running as other users.. including NT AUTHORITY\SYSTEM
+Kerberoasting is the process of cracking a Kerberos Ticket and rebuilding them to gain access to a targeted service. This allows us to take control of services running as other users.. including `NT AUTHORITY\SYSTEM`
 
 Because we have a service account we are able to attempt to grab some tickets and crack some passwords.
 
-The Impacket suite or tools has everything we need to perform a Kerberoast attack.
+The `Impacket` suite or tools has everything we need to perform a Kerberoast attack.
 
 Let's start by grabbing the hashes for any accounts that
 ```
