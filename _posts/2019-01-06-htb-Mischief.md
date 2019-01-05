@@ -551,7 +551,7 @@ loki@Mischief: getfacl -R -s -p / | sed -n 's/^# file: //p'
 //var/log/journal
 ```
 
-Once we have a list of files, we can use getfacls to look at the specifics of the ACLs and get a better insight into whats applied to the files:
+Once we have a list of files, we can use `getfacls` to look at the specifics of the ACLs and get a better insight into whats applied to the files:
 ```
 loki@Mischief:~$ getfacl /usr/bin/sudo
 getfacl: Removing leading '/' from absolute path names
