@@ -290,7 +290,7 @@ Now if we browse to http://mischief.htb we are presented with a new website:
 ![223870986.png]({{site.baseurl}}/Images/Mischief/223870986.png)
 
 
-We try the credentials listed on the first website to try and log in to the website. Neither of them work, so the next step is to try and brute force some candidates from a custom wordlist. We generate two lists. One with potential usernames and another with potential passwords:
+We try the credentials listed on the first website but neither of them work, so the next step is to try and brute force some candidates from a custom wordlist. We generate two lists. One with potential usernames and another with potential passwords:
 ```
 root@kali: cat users.txt
 loki
