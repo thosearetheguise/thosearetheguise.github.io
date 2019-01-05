@@ -158,11 +158,10 @@ Browsing there we are prompted for HTTP Authentication credentials:
 ![223543464.png]({{site.baseurl}}/Images/Mischief/223543464.png)
 
 
-
 We use the creds loki:godofmischiefisloki and gain access to the site.
 
 Preparing for our gobuster enumeration we try to navigate to a 404 page to see if we can get the server to leak some information (server version, web server etc) and we see that a page is returned:
-
+![223543301.png]({{site.baseurl}}/Images/Mischief/223543301.png)
 
 
 Initially we believed that this was a custom error page with a HTTP 200 response as a way to block tools like gobuster and dirbuster. So we went straight to wfuzz instead:
