@@ -135,7 +135,7 @@ Copyright (c) 2005-2015 by Matteo Cantoni (www.nothink.org)
   626                   zlib1g-1:1.2.11.dfsg-0ubuntu2
 ```
 
-We can see an interesting line in the results that the server is running a SimpleHTTPAuthServer (https://github.com/tianhuil/SimpleHTTPAuthServer)
+We can see an interesting line in the results that the server is running a [SimpleHTTPAuthServer](https://github.com/tianhuil/SimpleHTTPAuthServer)
 
 Reading the usage we can see that the command includes a port number and credentials:
 ```
@@ -155,6 +155,7 @@ optional arguments:
 Once the all port scan finishes we can see that port 3366 is open to us, (our snmp-check also confirms that the server is listening on that port)
 
 Browsing there we are prompted for HTTP Authentication credentials:
+![223543464.png]({{site.baseurl}}/Images/Mischief/223543464.png)
 
 
 
