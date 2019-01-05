@@ -283,7 +283,7 @@ dead:beef:0000:0000:0250:56ff:fea4:c815 mischief.htb
 
 
 Now if we browse to http://mischief.htb we are presented with a new website:
-
+![223870986.png]({{site.baseurl}}/Images/Mischief/223870986.png)
 
 
 
@@ -334,7 +334,7 @@ guest
 The lists were generated from splitting all the words in the passwords we have encountered so far, miscief comes from the page title of the first website, this could be a typo, or could be on purpose, this is a trolly box so we assume nothing is a mistake, at the end we have also added some common default credentials.
 
 We use burp to intercept a test login request and can see that a failed login includes some new content on the page "Sorry, those credentials do not match"
-
+![223543345.png]({{site.baseurl}}/Images/Mischief/223543345.png)
 
 
 We can use the details of this request combined with the tool hydra to brute force the login form:
@@ -352,7 +352,7 @@ Hydra (http://www.thc.org/thc-hydra) finished at 2018-12-15 13:13:44
 
 
 We get a hit! The credentials administrator:trickeryanddeceit are able to log in to the site:
-
+![223576097.png]({{site.baseurl}}/Images/Mischief/223576097.png)
 
 
 The website states that there are credentials in one of the users home directory's, sounds like a good next step to work towards.
