@@ -357,12 +357,12 @@ We get a hit! The credentials administrator:trickeryanddeceit are able to log in
 
 The website states that there are credentials in one of the users home directory's, sounds like a good next step to work towards.
 
-Intercepting the default request with Burp we can see that we get no command output from the ping request
+Intercepting the default request with Burp we can see that we get no command output from the ping request:
 
 
 
 It looks like simply adding a new line character [ENTER] after the ping command gets the site to show the command output:
-
+![45643.png]({{site.baseurl}}/Images/Mischief/45643.png)
 
 
 Starting with some basic command chaining we can see who the website is running as:
