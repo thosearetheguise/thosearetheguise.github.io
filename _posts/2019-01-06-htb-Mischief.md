@@ -1,5 +1,9 @@
 ---
-published: false
+published: true
+layout: post
+author: Jake
+date: '2019-01-06 00:00:01 UTC'
+tags: htb walkthrough mischief
 ---
 This week we are taking a look at the retired Hack The Box machine [Mischief](https://www.hackthebox.eu/home/machines/profile/145) (Medium difficulty)
 
