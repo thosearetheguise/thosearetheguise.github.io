@@ -358,7 +358,7 @@ We get a hit! The credentials administrator:trickeryanddeceit are able to log in
 The website states that there are credentials in one of the users home directory's, sounds like a good next step to work towards.
 
 Intercepting the default request with Burp we can see that we get no command output from the ping request:
-
+![223739951.png]({{site.baseurl}}/Images/Mischief/223739951.png)
 
 
 It looks like simply adding a new line character [ENTER] after the ping command gets the site to show the command output:
@@ -449,7 +449,7 @@ command=cat /home/loki/cred''ent''ials; ping -c 1 127.0.0.1
 ```
 
 Initially this does not seem to work, this could be because the blacklist contains portions of the words as well like cred etc. but if we expand it to separate every letter we get a result:
-
+![223707216.png]({{site.baseurl}}/Images/Mischief/223707216.png)
 
 
 As we read these credentials from loki's home directory and we remember from our initial nmap scan that the box has SSH open, we assume they can be used to SSH into the box as loki.
