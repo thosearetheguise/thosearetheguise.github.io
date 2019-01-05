@@ -277,7 +277,7 @@ Nmap done: 1 IP address (1 host up) scanned in 17.31 seconds
 ```
 
 You might notice that Firefox does not handle IPv6 addresses directly, so we need to update our `/etc/hosts` file to map it to a friendly name:
-(After further research we also found that you can wrap the IPv6 address in square brackets  and Firefox will browse there: [beef:0000:0000:0250:56ff:fea4:c815]
+(After further research we also found that you can wrap the IPv6 address in square brackets  and Firefox will browse there: `[beef:0000:0000:0250:56ff:fea4:c815]`)
 ```
 root@kali: vim /etc/hosts
 ...
