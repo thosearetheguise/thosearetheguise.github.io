@@ -61,6 +61,7 @@ Nmap done: 1 IP address (1 host up) scanned in 248.38 seconds
 ```
 
 Looks like we have a website running, so checking that out, we get presented with a website and login page:
+
 ![227573786.png]({{site.baseurl}}/Images/SecNotes/227573786.png)
 
 Because we have a website, we always want some enumeration running in the background, so we run a gobuster in the background while we manually poke around at the site.
@@ -112,6 +113,7 @@ There is a link to sign up, so while sqlmap runs in the background, lets create 
 ![227639350.png]({{site.baseurl}}/Images/SecNotes/227639350.png)
 
 There is a lot functionality to test here, we try some basic sql inject the functionality of the website but do not get any hits:
+
 ![227541050.png]({{site.baseurl}}/Images/SecNotes/227541050.png)
 ![227672098.png]({{site.baseurl}}/Images/SecNotes/227672098.png)
 
@@ -160,6 +162,7 @@ smb: \>
 ```
 
 Looks like we have an IIS web root directory. But where is it? Looking back at our gobuster results to see if there was something we missed, but nothing comes up for port 80. We should also look back at our all port nmap scan to see if this IIS site is running on a different port. And we can see that it is running on port 8808.
+
 ![227704931.png]({{site.baseurl}}/Images/SecNotes/227704931.png)
 
 We have write access to this directory, lets test if we can execute code by browsing to a page.
