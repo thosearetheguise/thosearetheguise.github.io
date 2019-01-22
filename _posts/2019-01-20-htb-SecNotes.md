@@ -208,7 +208,7 @@ C:\inetpub\new-site>
 
 If the server has an AV running it could block us from being able to upload binaries like `nc.exe` or payloads generated with msfvenom. When that is the case we need to write our own reverse shell binary that will run on Windows. If we have no access to a Windows machine to write and compile such a binary we can still write and compile C and C++ applications on Linux using the mingw cross-compiler.
 
-This is a sample persistent reverse shell binary that we have modified, that an AV will not know the signatures for and most likely not block: LINK TO GIST
+This is a sample persistent reverse shell binary that we have modified, that an AV will not know the signatures for and most likely not block: [rev.c](https://github.com/thosearetheguise/rev)
 
 Now that we are on the box as user, we can read the `user.txt` flag.
 
