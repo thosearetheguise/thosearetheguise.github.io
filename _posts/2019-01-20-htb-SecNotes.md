@@ -115,7 +115,9 @@ There is a lot functionality to test here, we try some basic sql inject the func
 ![227541050.png]({{site.baseurl}}/Images/SecNotes/227541050.png)
 ![227672098.png]({{site.baseurl}}/Images/SecNotes/227672098.png)
 
-We do see at the top of the page when we first logged on that there is at least a `tyler` user.. Maybe we can use the registration page to impersonate them with some crafted sql injection using a technique called Second Order Injection. (On stream we go into detail on the concepts of SQL Injection as well as the differences between standard SQL Injection and Second Order SQL Injection)
+We do see at the top of the page when we first logged on that there is at least a `tyler` user.. Maybe we can use the registration page to impersonate them with some crafted sql injection using a technique called Second Order Injection. 
+
+> On stream we go into detail on the concepts of SQL Injection as well as the differences between standard SQL Injection and Second Order SQL Injection A link to the VOD will be placed here after the stream.
 
 To prove the concept we try some basic sql injection on the registration page:
 ![227573824.png]({{site.baseurl}}/Images/SecNotes/227573824.png)
