@@ -112,7 +112,7 @@ root@kali: sqlmap -r login.req --level 5 --risk 3
 There is a link to sign up, so while sqlmap runs in the background, lets create a user and see if we can successfully log in to the site:
 ![227639350.png]({{site.baseurl}}/Images/SecNotes/227639350.png)
 
-There is a lot functionality to test here, we try some basic sql inject the functionality of the website but do not get any hits:
+There is a lot functionality to test here,let's try some n00b SQL injection.
 
 ![227541050.png]({{site.baseurl}}/Images/SecNotes/227541050.png)
 ![227672098.png]({{site.baseurl}}/Images/SecNotes/227672098.png)
@@ -349,10 +349,3 @@ root@kali: cat root.txt
 
 
 This was a great box for learning some basic SQL Injection as well as how in the same way that using a Linux Live or dual booting can read a complete windows file system regardless of the Windows permissions, Windows 10's new Linux subsystem allows the Windows user full access to the Linux file system, regardless of the Linux permissions. (So long as you have the necessary Windows permissions to read the `%APPDATA%` directory.
-
-
-
-
-
-
-
