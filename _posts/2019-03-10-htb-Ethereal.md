@@ -1,5 +1,9 @@
 ---
-published: false
+published: true
+layout: post
+author: Jake
+date: '2019-03-10 00:00:01 UTC'
+tags: htb walkthrough ethereal
 ---
 This week we are taking a look at the retired Hack The Box machine [Ethereal](https://www.hackthebox.eu/home/machines/profile/157) (Hard difficulty)
 
