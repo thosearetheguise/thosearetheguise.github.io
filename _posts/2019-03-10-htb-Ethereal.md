@@ -849,6 +849,7 @@ Terminal2: openssl s_server -quiet -key key.pem -cert cert.pem -port 136 < those
 Get the signed MSI onto the box and wait...
 
 As we trawl through the list of results we notice something interesting...
+
 ![231899237.png]({{site.baseurl}}/Images/Ethereal/231899237.png)
 
 Rupal has the root flag?! Lets see if it's true:
