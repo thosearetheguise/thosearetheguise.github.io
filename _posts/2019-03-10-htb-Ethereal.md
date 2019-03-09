@@ -202,6 +202,7 @@ We can see that we are successfully being sent 2 ping requests.
 We have seen something similar to this on a previous HTB machine [Mischief](https://so.thosearethegui.se/2019/01/06/htb-Mischief.html), so we try to follow a similar path to get some form of command execution.
 
 First we start off by looking at the page source to see if there is anything hidden, but there is nothing there so we fire up Burp and see if there is anything interesting in the requests we might be able to exploit.
+
 ![230850750.png]({{site.baseurl}}/https:/so.thosearethegui.se/2019/01/06/htb-Mischief.html/230850750.png)
 
 Looking at the request and response we see a `Powered By: ASP.NET` banner. The `_VIEWSTATE` and `_EVENTVALIDATION` variables are common in .NET web applications. Looks like there are 2 non standard variables we might be able to perform RCE against, the `search` and `ctl02`. Starting with search we try many different methods of RCE we have tries in the past, command chaining with `;`, `&&`, new lines etc and see that if we use command chaining, the application does not error:
