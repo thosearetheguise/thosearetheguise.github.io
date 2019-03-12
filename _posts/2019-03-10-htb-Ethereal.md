@@ -5,7 +5,9 @@ author: Jake
 date: '2019-03-10 00:00:01 UTC'
 tags: htb walkthrough ethereal
 ---
-This week we are taking a look at the retired Hack The Box machine [Ethereal](https://www.hackthebox.eu/home/machines/profile/157) (Hard difficulty)
+This week we are taking a look at the retired Hack The Box machine [Ethereal](https://www.hackthebox.eu/home/machines/profile/157) (Insane difficulty)
+
+![ethereal.png]({{site.baseurl}}/Images/Ethereal/ethereal.png)
 
 We start off as we always do with an nmap scan:
 ```
@@ -864,4 +866,3 @@ Repeat all the steps and....
 ![231735412.png]({{site.baseurl}}/Images/Ethereal/231735412.png)
 
 We have the root.txt flag!
-
