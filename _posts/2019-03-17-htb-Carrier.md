@@ -5,11 +5,12 @@ author: Rstyms
 date: '2019-03-17 00:00:01 UTC'
 tags: htb walkthrough Carrier
 ---
-First of all, set up a folder and then run nmap:
+This week we are taking a look at the retired Hack The Box machine [Carrier](https://www.hackthebox.eu/home/machines/profile/155) (Medium difficulty)
 
-This week we are taking a look at the retired Hack The Box machine [Ethereal](https://www.hackthebox.eu/home/machines/profile/157) (Insane difficulty)
 
 ![carrier.png]({{site.baseurl}}/Images/Carrier/carrier.png)
+
+First of all, set up a folder and then run nmap:
 
 ```
 root@kali: nmap -sU -sC -sV -oN nmap 10.10.10.105
