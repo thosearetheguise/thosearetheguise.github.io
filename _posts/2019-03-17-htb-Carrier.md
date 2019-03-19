@@ -1,9 +1,9 @@
 ---
 published: true
 layout: post
-author: Rstyms
+author: rstyms
 date: '2019-03-17 00:00:01 UTC'
-tags: htb walkthrough Carrier
+tags: htb walkthrough carrier
 ---
 This week we are taking a look at the retired Hack The Box machine [Carrier](https://www.hackthebox.eu/home/machines/profile/155) (Medium difficulty)
 
