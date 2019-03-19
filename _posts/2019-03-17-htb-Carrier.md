@@ -7,7 +7,6 @@ tags: htb walkthrough carrier
 ---
 This week we are taking a look at the retired Hack The Box machine [Carrier](https://www.hackthebox.eu/home/machines/profile/155) (Medium difficulty)
 
-
 ![carrier.png]({{site.baseurl}}/Images/Carrier/carrier.png)
 
 First of all, set up a folder and then run nmap:
