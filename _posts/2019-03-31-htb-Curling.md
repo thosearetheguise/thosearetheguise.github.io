@@ -39,7 +39,9 @@ We try some common default credential combinations like `admin:admin`, `admin:pa
 Similar to Drupal and Wordpress there are CMS scanners for Joomla:
 
 [JoomlaScan](https://github.com/drego85/JoomlaScan)
+
 [JoomScan](https://github.com/rezasp/joomscan)
+
 We download both of those into `/opt/scanners/` and let them run in the background:
 ```
 root@kali: perl joomscan.pl -u 10.10.10.150
@@ -122,6 +124,7 @@ As we are www-data we need to poke around to see if we can become a user or the 
 We can see the users floris and root
 
 poking around home directories:
+
 ![210534475.png]({{site.baseurl}}/Images/Curling/210534475.png)
 
 Based on the file permissions we can see that we are able to read an interesting looking file called `password_backup`
