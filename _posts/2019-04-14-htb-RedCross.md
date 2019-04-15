@@ -94,6 +94,7 @@ To see the contents of the variable we have to host a server using our friend Si
 root@kali: python -m SimpleHTTPServer 80
 ```
 Once we have the web server listening, place the XSS script into the contact phone field and submit the form:
+
 ![217972750.png]({{site.baseurl}}/Images/RedCross/217972750.png)
 
 Once the form submits, looking back at our web server we can see that we have a call back with someones cookie:
