@@ -229,12 +229,15 @@ root@kali: cat PRTG\ Configuration.old.bak| grep -A 10 -B 10 password
 After looking at the file contents manually we can see that they are XML nodes and so we use the `-A` and `-B` arguments in grep to grab 10 lines above and below any lines that match the string “password” and we can see that we get a match for `prtgadmin:PrTg@dmin2018`
 
 We have been so focused on the FTP we still haven’t looked at the websites yet. Straight up on port 80 we have what looks like the web interface for the PRTG Network Monitor. We try the credentials but they don’t seem to work:
+
 ![232226854.png]({{site.baseurl}}/Images/Netmon/232226854.png)
 
 Thinking back, we did get the password from a .old.bak file, so it is possible that the user has changed the password since the backup was performed. Most users are creatures of habit and when required to change a password will simply increment the numbers on the end. Since the password we have ends in 2018 and the current year is now 2019 we try updating the password to `PrTg@dmin2019` and it works like a charm:
+
 ![232226864.png]({{site.baseurl}}/Images/Netmon/232226864.png)
 
 One thing we notice almost straight away is the notification that there are updates available. Clicking the link we are directed to a screen showing us the currently installed version is 18.1.37.13946:
+
 ![232357905.png]({{site.baseurl}}/Images/Netmon/232357905.png)
 
 Now that we have some credentials we can start looking for authenticated exploits. This combined with the software version we come across a [blog](https://www.codewatch.org/blog/?p=453) with an authenticated command execution exploit. So we head back to FTP to verify that the scripts mentioned are unsanitised by downloading them locally:
@@ -319,6 +322,7 @@ Use the little blue + on the right to create a new notification. Give the notifi
 ```
 thoseguys.txt; ping 10.10.14.22
 ```
+
 ![232488998.png]({{site.baseurl}}/Images/Netmon/232488998.png)
 
 Save the notification and head back on our attacking machine set up an ICMP listener to see if we get any ping requests from the target:
