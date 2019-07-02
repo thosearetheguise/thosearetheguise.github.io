@@ -6,8 +6,9 @@ date: '2019-06-30 00:00:01 UTC'
 tags: htb walkthrough Netmon
 Published: true
 ---
-First of all we run an nmap scan:
+This week we are taking a look at the retired Hack The Box machine [Netmon](https://www.hackthebox.eu/home/machines/profile/177) (Easy difficulty)
 
+First of all we run an nmap scan:
 
 ```
 root@kali: nmap -sC -sV -oN nmap 10.10.10.152
