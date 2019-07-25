@@ -5,6 +5,8 @@ author: jake
 date: '2019-07-14 00:00:01 UTC'
 tags: htb walkthrough friendzone
 ---
+This week we are taking a look at the retired Hack The Box machine [Friendzone](https://www.hackthebox.eu/home/machines/profile/173) (Easy-Medium difficulty)
+
 Start of as we always do with nmap:
 ```
 root@kali: nmap -sC -sV -oN nmap 10.10.10.123 
