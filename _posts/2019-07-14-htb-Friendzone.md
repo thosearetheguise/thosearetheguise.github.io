@@ -1,5 +1,9 @@
 ---
-published: false
+published: true
+layout: post
+author: jake
+date: '2019-07-14 00:00:01 UTC'
+tags: htb walkthrough friendzone
 ---
 Start of as we always do with nmap:
 ```
@@ -133,7 +137,7 @@ Moving on down the list we notice that it also has DNS, this could be open to a 
 
 ![253395020.png]({{site.baseurl}}/Images/Friendzone/253395020.png)
 
-Looks like one potential candidate for a domain is friendzoneportal.red
+Looks like one potential candidate for a domain is `friendzoneportal.red`
 
 So we add that to our hosts file and re-run our DNS tools.
 ```
@@ -170,7 +174,7 @@ Nothing on HTTP.. but hitting all the sub domains over HTTPS gives us something 
 
 ![253984776.png]({{site.baseurl}}/Images/Friendzone/253984776.png)
 
-Trying admin:admin:
+Trying `admin:admin`:
 
 ![253919243.png]({{site.baseurl}}/Images/Friendzone/253919243.png)
 
@@ -416,7 +420,7 @@ friend@FriendZone:~$ ls -la /usr/lib/python2.7/os.py
 
 Wow! Ok looks like a good option. Time to get to it.
 
-Heading back to pentestmonkey to grab the pyton reverse shell one liner and expand it out to be proper python code by removing all the semi colons and placing the code at the bottom of the script. Because we are already in the os library we can also remove all the os. sections., we take over the `os.py` file with our shell:
+Heading back to pentestmonkey to grab the python reverse shell one liner and expand it out to be proper python code by removing all the semi colons and placing the code at the bottom of the script. Because we are already in the os library we can also remove all the os. sections., we take over the `os.py` file with our shell:
 ```
 friend@FriendZone:~$ nano /usr/lib/python2.7/os.py
 ... Rest of os.py
