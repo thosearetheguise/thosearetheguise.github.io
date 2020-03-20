@@ -1404,6 +1404,8 @@ We start off by trying to buffer overflow with pattern create to attempt a buffe
 
 However printf() is called when we look at the code:
 
+![370081811.png]({{site.baseurl}}/Images/pp3/370081811.png)
+
 Code decompiled by Ghidra:
 
 ```
@@ -1502,6 +1504,7 @@ Using `$p` is not ideal because it prints the leading `0x`. Reading the printf()
 
 This means that in order to get a consistent output length helping our chances, we can replace `$p` with `$0x`. Eventually we are able to find accurate offsets:
 
+![424509445.png]({{site.baseurl}}/Images/pp3/424509445.png)
 
 The cracks in the "intro to format string exploits" tutorial we were following start to show around this point. Specifically how it has been rigged to be easy to exploit. Their example calls the `system()` function meaning that they can pass the string "sh;#" to that function and it will directly execute a shell. 
 
