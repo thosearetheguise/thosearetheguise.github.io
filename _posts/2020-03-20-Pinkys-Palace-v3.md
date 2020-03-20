@@ -1029,7 +1029,7 @@ root@kali: file libpinksec.so
 libpinksec.so: ELF 32-bit LSB shared object, Intel 80386, version 1 (SYSV), dynamically linked, BuildID[sha1]=a2a121b1170c7dd666bc1a9068cd237c50cd72df, not stripped
 ```
 
-A common [linux privesc technique](https://www.contextis.com/en/blog/linux-privilege-escalation-via-dynamically-linked-shared-object-library) is to use shared object libraries and some misconfigurations to get the application to use a different shared library file. We know that myexec uses the libseclogin.so shared library, so that looks like a good target for us. Linux will look for shared libraries in the following order: (taken from https://linux.die.net/man/1/ld)
+A common [linux privesc technique](https://www.contextis.com/en/blog/linux-privilege-escalation-via-dynamically-linked-shared-object-library) is to use shared object libraries and some misconfigurations to get the application to use a different shared library file. We know that myexec uses the libseclogin.so shared library, so that looks like a good target for us. Linux will look for shared libraries in the following order: (taken from [https://linux.die.net/man/1/ld](https://linux.die.net/man/1/ld))
 
 1. Any directories specified by rpath-link options (directories specified by rpath-link options are only effective at link time)
 2. Any directories specified by –rpath options (directories specified by rpath options are included in the executable and used at runtime)
