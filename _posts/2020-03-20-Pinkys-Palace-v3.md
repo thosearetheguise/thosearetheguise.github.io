@@ -1382,7 +1382,9 @@ Looking at the [printf() man page](http://www.cplusplus.com/reference/cstdio/pri
 
 Another great resource for beginner format string exploits can be found on [codearcana](http://codearcana.com/posts/2013/05/02/introduction-to-format-string-exploits.html) We used this as a reference, but a lot of the samples are gamed to work and be easy...
 
+
 > If you follow along the VOD you will notice that even the live demo differs from the writeup. It is not likely that you will be able to copy/paste the next section and have a working exploit. We recommend you read and try to understand and adapt this exploit to match your own environment.
+
 
 Combining these two pieces of information we can use the argument `"%p %p %p %p %p %p %p %p %p %p"` to trick the printf function into having 10 arguments, it will then print the next 10 pointer addresses from the stack:
 ```
