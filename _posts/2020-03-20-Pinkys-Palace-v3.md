@@ -1527,7 +1527,7 @@ Just to recap. We know:
 
 * We control the addresses at the offsets of 136 and 137
 * Our environment variable will be at the address `0xbfffff74`
-* The pointer for putchar is `0x0804a01c`
+* The pointer for putchar is `0x0804a01c` (This is the address we want to replace with our environment variable address)
 
 The final piece of the puzzle is writing our address to the stack. Going back to our format string exploit tutorial it mentions replacing the %x with %n which will write the number of characters printed so far to the current location. This isn’t as straight forward as simply replacing our $0x from before with $n…
 
