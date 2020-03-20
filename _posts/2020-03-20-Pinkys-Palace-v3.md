@@ -1,5 +1,9 @@
 ---
-published: false
+published: true
+layout: post
+author: jake
+date: '2020-03-20 00:00:01 UTC'
+tags: ctf vulnhub pinkys-palace
 ---
 It has been a while since we posted. We have not stopped, but rather moved away from Twitch and over to [youtube](https://www.youtube.com/channel/UCBE5zF0VuDwn2-cAMNBJvkA)! 
 
