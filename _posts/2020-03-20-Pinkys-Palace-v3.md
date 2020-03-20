@@ -1287,7 +1287,7 @@ pinksecmanagement@pinkys-palace:~$
 
 ```
 
-Re looking at our SUID binaries we see something non standard in the response:
+Re-looking at our SUID binaries we see something non standard in the response:
 
 ```
 pinksecmanagement@pinkys-palace:~$ find / -perm -4000 2>/dev/null
