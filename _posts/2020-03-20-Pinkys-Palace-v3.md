@@ -1090,7 +1090,7 @@ In the pinksecd binary we notice that the psbanner function is the first to be c
 ![351502355.png]({{site.baseurl}}/Images/pp3/351502355.png)
 
 ## Stream 3
-https://www.youtube.com/watch?v=o9Fl4RNzHDU
+[https://www.youtube.com/watch?v=o9Fl4RNzHDU](https://www.youtube.com/watch?v=o9Fl4RNzHDU)
 
 Time to create and compile our own malicious version of the shared object.
 ```
