@@ -1552,7 +1552,7 @@ We need to write the lower word first, then the upper word. To do this we need t
 * ff74 = 65396
 * bfff = 49151
 
-Once again. it is not that simple! Because we have already written two 4 byte addresses (AAAABBBB) and our two C’s as padding, we need to take these off the decimal total. So our lower becomes `65396 - 10 = 65386`. Didn’t need a calculator for that one! (Aren’t we smart)
+Once again. It is not that simple! Because we have already written two 4 byte addresses (AAAABBBB) and our two C’s as padding, we need to take these off the decimal total. So our lower becomes `65396 - 10 = 65386`. Didn’t need a calculator for that one! (Aren’t we smart)
 
 With this knowledge we update our exploit to replace the A’s and B’s with the addresses calculated above and use the %u format specifier to pad the input with the given int:
 ```
