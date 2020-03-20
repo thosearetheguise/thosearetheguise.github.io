@@ -210,109 +210,59 @@ So we move on to finding an actual exploit.
 ```
 
 root@kali: searchsploit drupal
-
 ------------------------------------------------------------------------------------------ ----------------------------------------
-
  Exploit Title                                                                            |  Path
-
                                                                                           | (/usr/share/exploitdb/)
-
 ------------------------------------------------------------------------------------------ ----------------------------------------
-
 Drupal 4.0 - News Message HTML Injection                                                  | exploits/php/webapps/21863.txt
-
 Drupal 4.1/4.2 - Cross-Site Scripting                                                     | exploits/php/webapps/22940.txt
-
 Drupal 4.5.3 < 4.6.1 - Comments PHP Injection                                             | exploits/php/webapps/1088.pl
-
 Drupal 4.7 - 'Attachment mod_mime' Remote Command Execution                               | exploits/php/webapps/1821.php
-
 Drupal 4.x - URL-Encoded Input HTML Injection                                             | exploits/php/webapps/27020.txt
-
 Drupal 5.2 - PHP Zend Hash ation Vector                                                   | exploits/php/webapps/4510.txt
-
 Drupal 5.21/6.16 - Denial of Service                                                      | exploits/php/dos/10826.sh
-
 Drupal 6.15 - Multiple Persistent Cross-Site Scripting Vulnerabilities                    | exploits/php/webapps/11060.txt
-
 Drupal 7.0 < 7.31 - 'Drupalgeddon' SQL Injection (Add Admin User)                         | exploits/php/webapps/34992.py
-
 Drupal 7.0 < 7.31 - 'Drupalgeddon' SQL Injection (Admin Session)                          | exploits/php/webapps/44355.php
-
 Drupal 7.0 < 7.31 - 'Drupalgeddon' SQL Injection (PoC) (Reset Password) (1)               | exploits/php/webapps/34984.py
-
 Drupal 7.0 < 7.31 - 'Drupalgeddon' SQL Injection (PoC) (Reset Password) (2)               | exploits/php/webapps/34993.php
-
 Drupal 7.0 < 7.31 - 'Drupalgeddon' SQL Injection (Remote Code Execution)                  | exploits/php/webapps/35150.php
-
 Drupal 7.12 - Multiple Vulnerabilities                                                    | exploits/php/webapps/18564.txt
-
 Drupal 7.x Module Services - Remote Code Execution                                        | exploits/php/webapps/41564.php
-
 Drupal < 4.7.6 - Post Comments Remote Command Execution                                   | exploits/php/webapps/3313.pl
-
 Drupal < 5.1 - Post Comments Remote Command Execution                                     | exploits/php/webapps/3312.pl
-
 Drupal < 5.22/6.16 - Multiple Vulnerabilities                                             | exploits/php/webapps/33706.txt
-
 Drupal < 7.34 - Denial of Service                                                         | exploits/php/dos/35415.txt
-
 Drupal < 7.58 - 'Drupalgeddon3' (Authenticated) Remote Code (Metasploit)                  | exploits/php/webapps/44557.rb
-
 Drupal < 7.58 - 'Drupalgeddon3' (Authenticated) Remote Code Execution (PoC)               | exploits/php/webapps/44542.txt
-
 Drupal < 7.58 / < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execution       | exploits/php/webapps/44449.rb
-
 Drupal < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execution (Metasploit)   | exploits/php/remote/44482.rb
-
 Drupal < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execution (PoC)          | exploits/php/webapps/44448.py
-
 Drupal < 8.5.11 / < 8.6.10 - RESTful Web Services unserialize() Remote Command Execution  | exploits/php/remote/46510.rb
-
 Drupal < 8.6.10 / < 8.5.11 - REST Module Remote Code Execution                            | exploits/php/webapps/46452.txt
-
 Drupal < 8.6.9 - REST Module Remote Code Execution                                        | exploits/php/webapps/46459.py
-
 Drupal Module Ajax Checklist 5.x-1.0 - Multiple SQL Injections                            | exploits/php/webapps/32415.txt
-
 Drupal Module CAPTCHA - Security Bypass                                                   | exploits/php/webapps/35335.html
-
 Drupal Module CKEditor 3.0 < 3.6.2 - Persistent EventHandler Cross-Site Scripting         | exploits/php/webapps/18389.txt
-
 Drupal Module CKEditor < 4.1WYSIWYG (Drupal 6.x/7.x) - Persistent Cross-Site Scripting    | exploits/php/webapps/25493.txt
-
 Drupal Module CODER 2.5 - Remote Command Execution (Metasploit)                           | exploits/php/webapps/40149.rb
-
 Drupal Module Coder < 7.x-1.3/7.x-2.6 - Remote Code Execution                             | exploits/php/remote/40144.php
-
 Drupal Module Cumulus 5.x-1.1/6.x-1.4 - 'tagcloud' Cross-Site Scripting                   | exploits/php/webapps/35397.txt
-
 Drupal Module Drag & Drop Gallery 6.x-1.5 - 'upload.php' Arbitrary File Upload            | exploits/php/webapps/37453.php
-
 Drupal Module Embedded Media Field/Media 6.x : Video Flotsam/Media: Audio Flotsam - Multi | exploits/php/webapps/35072.txt
-
 Drupal Module RESTWS 7.x - PHP Remote Code Execution (Metasploit)                         | exploits/php/remote/40130.rb
-
 Drupal Module Sections - Cross-Site Scripting                                             | exploits/php/webapps/10485.txt
-
 Drupal Module Sections 5.x-1.2/6.x-1.2 - HTML Injection                                   | exploits/php/webapps/33410.txt
-
 Drupal avatar_uploader v7.x-1.0-beta8 - Arbitrary File Disclosure                         | exploits/php/webapps/44501.txt
-
 ------------------------------------------------------------------------------------------ ----------------------------------------
-
 Shellcodes: No Result
-
 ----------------------------------------------------------------------------------- -----------------------------------------------
-
 ```
 
 However two options are appealing:
 
 ```
-
 Drupal < 7.58 / < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execution       | exploits/php/webapps/44449.rb
-
 Drupal < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execution (PoC)          | exploits/php/webapps/44448.py
 
 ```
