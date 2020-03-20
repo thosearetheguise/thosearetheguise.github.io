@@ -935,6 +935,8 @@ ID           Response   Lines    Word     Chars       Payload
 
 And we get a redirect when we use the pin 55849. Time to head over to the site and try all the creds.
 
+![index.png]({{site.baseurl}}/Images/pp3/index.png)
+
 We have a bash command input. We also know our socat bind shell works, so lets reuse that again and see if we have changed user contexts.
 ```
 Server - Web input form:
