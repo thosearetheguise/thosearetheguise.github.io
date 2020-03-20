@@ -1335,7 +1335,7 @@ root@kali: scp -i thoseguys -P 5555 pinksecmanagement@192.168.1.148:/home/pinkse
 
 We start off by trying to buffer overflow with pattern create to attempt a buffer overflow, but a pattern of 100,000 is handled perfectly fine, so it probably isn’t that.
 
-However printf() is called when we look at the code:
+However `printf()` is called when we look at the code:
 
 ![370081811.png]({{site.baseurl}}/Images/pp3/370081811.png)
 
