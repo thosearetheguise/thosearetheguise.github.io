@@ -1413,7 +1413,7 @@ pinksecmanagement@pinkys-palace:/tmp$ /usr/local/bin/PSMCCLI "$(python -c 'impor
 
 Now that we have a nice looking address that we control, it’s time to figure out the offset. Yes, we count the %p’s. Our 0x41414141 is the 135th %p. (We figured in the time it would take to write a count script, we could just count it manually)
 
-Referring back to the printf() manual, we can use the field width argument to select only the %p we want. A simple example is `printf("%2$x", 1, 2, 3)` with %2 being the number offset to print. If we change ours to print 135 we end up with:
+Referring back to the printf() manual, we can use the field width argument to select only the %p we want. A simple example is `printf("%2$x", 1, 2, 3)` with %2 being the offset number to print. If we change ours to print 135 we end up with:
 ```
 pinksecmanagement@pinkys-palace:/tmp$ /usr/local/bin/PSMCCLI 'AAAABBB%135$p'
 
