@@ -1744,6 +1744,8 @@ drwxr-xr-x 21 root              root                 4096 Apr 19  2018 ..
 
 Kernel modules cannot run system commands directly. This means that we cannot use `sudo insmod hello.ko` to upgrade our current shell directly to root. 
 
+When we run this module it successfully loads without error but doesn't do anything. Time to change that.
+
 So we head over to shell-storm again and pick any TCP bind shell. (Because we still can’t use a reverse shell) We went with [shellcode-882](http://shell-storm.org/shellcode/files/shellcode-882.php).
 
 To test it first (So we know it's not our payload if something doesnt work in our kernel module), copy it onto the target and compile it, then from our attacker machine we try to connect as pinky. 
