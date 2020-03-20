@@ -1748,7 +1748,7 @@ When we run this module it successfully loads without error but doesn't do anyth
 
 So we head over to shell-storm again and pick any TCP bind shell. (Because we still can’t use a reverse shell) We went with [shellcode-882](http://shell-storm.org/shellcode/files/shellcode-882.php).
 
-To test it first (So we know it's not our payload if something doesnt work in our kernel module), copy it onto the target and compile it, then from our attacker machine we try to connect as pinky. 
+Test the bind shell first (So we know it's not our payload if something doesnt work in our kernel module), copy it onto the target and compile it, then from our attacker machine we try to connect as pinky. 
 ```
 pinky@pinkys-palace:/tmp/bind$ gcc -fno-stack-protector -z execstack bindshell.c -o bindshell
 bindshell.c:23:1: warning: return type defaults to ‘int’ [-Wimplicit-int]
