@@ -1577,6 +1577,7 @@ $(python -c 'import sys; sys.stdout.write("\x1c\xa0\x04\x08\x1e\xa0\x04\x08CC%65
 
 > DON’T be dumb like me and forget the %0hn…. I wasted about an hour using just %hn and wondering why my offsets were out… #facepalm
 
+
 if you did everything correctly you should have a shell as pinky!
 
 ![424542305.png]({{site.baseurl}}/Images/pp3/424542305.png)
