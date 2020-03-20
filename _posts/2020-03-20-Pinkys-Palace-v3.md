@@ -1426,6 +1426,7 @@ Now we need to turn this into something. printf() has a %n argument, that is:
 
 > Nothing printed.The corresponding argument must be a pointer to a signed int.The number of characters written so far is stored in the pointed location.
 
+
 So in this case, if we use the command `AAAABBB%135$n` we would write the number 7 to the address `0x41414141`. This only works with small numbers, so if we were to use `AAAABBB%135x` 142 characters will be written (The argument padded by 135 characters). ​
 
 ## Stream 4
