@@ -670,6 +670,7 @@ And we have both ports 8001 and 8002 available to us on the entire network, tunn
 
 ![346226713.png]({{site.baseurl}}/Images/pp3/346226713.png)
 
+
 ## Stream 2
 [https://www.youtube.com/watch?v=XyE5bO1gp1k](https://www.youtube.com/watch?v=XyE5bO1gp1k)
 
@@ -1089,6 +1090,7 @@ In the pinksecd binary we notice that the psbanner function is the first to be c
 
 ![351502355.png]({{site.baseurl}}/Images/pp3/351502355.png)
 
+
 ## Stream 3
 [https://www.youtube.com/watch?v=o9Fl4RNzHDU](https://www.youtube.com/watch?v=o9Fl4RNzHDU)
 
@@ -1428,6 +1430,7 @@ Now we need to turn this into something. printf() has a %n argument, that is:
 
 
 So in this case, if we use the command `AAAABBB%135$n` we would write the number 7 to the address `0x41414141`. This only works with small numbers, so if we were to use `AAAABBB%135x` 142 characters will be written (The argument padded by 135 characters). ​
+
 
 ## Stream 4
 [https://www.youtube.com/watch?v=TtsN-9N5Dxs](https://www.youtube.com/watch?v=TtsN-9N5Dxs)
