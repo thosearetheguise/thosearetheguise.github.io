@@ -1127,7 +1127,11 @@ pinksec@pinkys-palace:/home/pinksec$ ls -la /lib/libpinksec.so
 
 De-compiling the existing object we see there are three functions we need to replicate:
 
+![351567888.png]({{site.baseurl}}/Images/pp3/351567888.png)
+
 In the pinksecd binary we notice that the psbanner function is the first to be called, so we will replace this function with our malicious code and leave the rest doing nothing.
+
+![351502355.png]({{site.baseurl}}/Images/pp3/351502355.png)
 
 ## Stream 3
 https://www.youtube.com/watch?v=o9Fl4RNzHDU
