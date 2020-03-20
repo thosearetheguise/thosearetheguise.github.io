@@ -1763,7 +1763,7 @@ whoami
 pinky
 ```
 
-Great! Now that we know that will work, we just need to get it to run as root in our kernel module.
+Great! Now that we know this bind shell will work, we just need to get it to run as root in our kernel module.
 
 Looking at a bunch of pre-existing rootkits we need an `arg[]` and an `envp[]` and to also call the function `call_usermodehelper()`
 
