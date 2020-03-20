@@ -1441,6 +1441,7 @@ Using `$p` is not ideal because it prints the leading `0x`. Reading the printf()
 
 > 0 Left-pads the number with zeroes (0) instead of spaces when padding is specified (see width sub-specifier).
 
+
 This means that in order to get a consistent output length helping our chances, we can replace `$p` with `$0x`. Eventually we are able to find accurate offsets:
 
 ![424509445.png]({{site.baseurl}}/Images/pp3/424509445.png)
@@ -1472,7 +1473,9 @@ Looking at the `putchar@plt` we can see that we have a JMP address:
 What this tells us that the pointer for putchar is `0x804a01c`. Now we need to figure out what to set that value to in order to jump and execute our shellcode. 
 
 We tried a bunch of different things here. Because everything is so touchy about lengths and offsets we tried a fixed length NOP sled, but found that tedious and hard to make consistently work. We then discovered this article from [OWASP](https://owasp.org/www-community/attacks/Buffer_Overflow_via_Environment_Variables) that discusses how environment variables are also stored in the stack, and often blindly trusted. The article mostly talks about using the environment variables to cause the buffer overflow but the last sentence is what put us on the right path for this box:
+
 > Code injection is performed in the same way as in buffer overflow attacks with only one difference; the shellcode is placed in environment variable(s).
+
 
 We can use environment variable to inject or execute shellcode on the stack! Now we just need to research how to do that… 
 
@@ -1498,7 +1501,6 @@ int main(int argc, char *argv[]) {
 }
 
 pinksecmanagement@pinkys-palace:/tmp/thoseguys$ gcc -o getenvaddr getenvaddr.c 
-
 pinksecmanagement@pinkys-palace:/tmp/thoseguys$
 ```
 
