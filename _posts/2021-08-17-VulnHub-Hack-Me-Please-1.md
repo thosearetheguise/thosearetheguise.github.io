@@ -1,5 +1,9 @@
 ---
-published: false
+published: true
+layout: post
+author: mark
+date: '2020-08-17 00:00:01 UTC'
+tags: ctf vulnhub hmp
 ---
 This week we are taking a look at a box from VulnHub. [Hack-me-please-1](https://www.vulnhub.com/entry/hack-me-please-1,731/) (Easy Difficulty)
 
@@ -95,7 +99,8 @@ Using browser dev tools to poke around on the website itself, we notice that the
 
 While digging into the main.js file, there is an interesting code comment:
 
-![main.js]({{site.baseurl}}/_posts/index.png)
+![index.png]({{site.baseurl}}/Images/vb-hmp/index.png)
+
 
 
 This tells us that there is another endpoint under the website to visit.
@@ -385,7 +390,7 @@ Lets try navigate to our shell.
 
 `http://<target>/seeddms51x/data/1048576/4/1.php`
 
-![webshell.png]({{site.baseurl}}/_posts/webshell.png)
+![webshell.png]({{site.baseurl}}/Images/vb-hmp/webshell.png)
 
 
 Adding our query string we can see that we have a working web shell:
@@ -393,14 +398,16 @@ Adding our query string we can see that we have a working web shell:
 ?cmd=whoami
 ```
 
-![webshell1.png]({{site.baseurl}}/_posts/webshell1.png)
+![webshell1.png]({{site.baseurl}}/Images/vb-hmp/webshell1.png)
+
 
 now we can do some basic enumeration of the machine itself. Through this we discover that nc is installed and hopefully we can use that to create our reverse shell:
 ```
 ?cmd=which+nc
 ```
 
-![webshell2.png]({{site.baseurl}}/_posts/webshell2.png)
+![webshell2.png]({{site.baseurl}}/Images/vb-hmp/webshell2.png)
+
 
 Lets go for a simple php reverse shell:
 ```
