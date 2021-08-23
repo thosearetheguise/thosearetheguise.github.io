@@ -1,5 +1,5 @@
 ---
-published: false
+published: true
 layout: post
 author: mark
 date: '2021-08-23 00:00:01 UTC'
@@ -522,4 +522,3 @@ root@darkhole:/home/john#
 root@darkhole:/home/john# whoami
 root
 ```
-
