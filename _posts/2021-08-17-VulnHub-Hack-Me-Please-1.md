@@ -12,6 +12,8 @@ This week we are taking a look at a box from VulnHub. [Hack-me-please-1](https:/
 - Coffee
 - We will be using a base Kali VM for this.
 
+Watch the [VOD](https://www.youtube.com/watch?v=kSM8H6ihqG8) from us streaming this box here. :)
+
 ##  Writeup:
 
 **Goal: Get root login.**
