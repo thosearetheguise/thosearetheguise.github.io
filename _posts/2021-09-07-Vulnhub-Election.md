@@ -427,7 +427,7 @@ love@election:~$
 
 Ok honesty time. Nothing initially stood out when we got here. We spent a fair bit of time spinning around, looking at cron jobs, and exploring the phpmyadmin to get into the db directly without much luck. After a day of refreshing gaming, we came back and decided to start looking some of the above listed applications from the sticky bits search.
 
-Now if you go through you would probably find vulnerabilities on a bunch of the applications, we just need one to work. And because this is a web server, lets see what might be out of the ordinary. That `/usr/local/Serv-U/Serv-U` one stood out as it was the only one that wasnt in a bin/sbin/lib folder. Also with the lockdowns driving me a bit nuts I was hoting it was some sort of drinks serving robot to provide me with cold beverages. Lets check it out.
+Now if you go through you would probably find vulnerabilities on a bunch of the applications, we just need one to work. And because this is a web server, lets see what might be out of the ordinary. That `/usr/local/Serv-U/Serv-U` one stood out as it was the only one that wasnt in a bin/sbin/lib folder. Also with the lockdowns driving me a bit nuts I was hoping it was some sort of drinks serving robot to provide me with cold beverages. Lets check it out.
 
 Checking the Serv-U dir.
 ```
@@ -515,7 +515,8 @@ Serv-U Web Client 9.0.0.5 - Remote Buffer Overflow (2)                          
 ------------------------------------------------------------------------------------------------------- ---------------------------------
 Shellcodes: No Results
 ```
-Just a few results there. And with out version (from the log) of 15.1.6.25 we spot 2 local priv esc vulns that might be worth checking (specially with the SUID bit set which means the app runs as the owner and not as the user who started it). [Exploit DB - Serv-U FTP Server < 15.1.7 - Local Privilege Escalation (1)](https://www.exploit-db.com/exploits/47009)
+Just a few results there. And with out version (from the log) of 15.1.6.25 we spot 2 local priv esc vulns that might be worth checking (specially with the SUID bit set which means the app runs as the owner and not as the user who started it).
+If you want to check the exploit out online, browse here [Exploit DB - Serv-U FTP Server < 15.1.7 - Local Privilege Escalation (1)](https://www.exploit-db.com/exploits/47009)
 ```
 searchsploit -m 47009
 ```
