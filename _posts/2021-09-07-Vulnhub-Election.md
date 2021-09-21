@@ -57,7 +57,7 @@ http://192.168.1.19
 This just gives us a simple Apache default page which while it tells us some info about the server its not giving us the expected website to interact and exploit. Lets jump to gobuster to see if we can find more.
 
 ```
-gobuster dir -u http://$TARGETIP/ -w /usr/share/wordlists/dirbuster/directory-list
+gobuster dir -u http://$TARGETIP/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x xml,txt,php,html
 ===============================================================
 Gobuster v3.1.0
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
