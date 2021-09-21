@@ -26,7 +26,7 @@ export TARGETIP=192.168.1.22
 ## Write up:
 
 [insert witty hackerkid intro line. :P ]
-Lets kick it off with the same thing we start with always. A good old nmap scan.
+Lets kick it off with the same thing we always start with. A good old nmap scan.
 
 ```
 nmap -sC -sV $TARGETIP -oN nmap.log
@@ -140,12 +140,12 @@ Processed Requests: 5000
 Filtered Requests: 4999
 Requests/sec.: 911.3057
 ```
-And we get back a hit on page_no=21. Lets browse to it and check it out.
+We use the `--hh 3654` argument to hide any responses with a length of 3654 characters, and we get back a hit on page_no=21. Lets browse to it and check it out.
 It looks like there is some extra text at the bottom of the page.
 
 ![image3.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE3.png)
 
-There have been a lot of hints to look at [DIG](https://linux.die.net/man/1/dig) so let’s go ahead and do that.
+Another hint to look at [DIG](https://linux.die.net/man/1/dig) so let’s go ahead and do that.
 
 
 ```
@@ -169,7 +169,7 @@ dig @$TARGETIP
 ;; WHEN: Thu Aug 26 12:43:40 AEST 2021
 ;; MSG SIZE  rcvd: 56
 ```
-Running a standard DIG command against our target IP address returns a cookie value which is unexpected.
+Running a standard `dig` command against our target IP address returns a cookie value which is unexpected.
 Lets try a dig using the domain info from our page21 site.
 
 ```
