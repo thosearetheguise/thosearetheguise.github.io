@@ -26,7 +26,7 @@ export TARGETIP=192.168.1.22
 ## Write up:
 
 [insert witty hackerkid intro line. :P ]
-Lets kick it off with the same thing we start with always. A good old nmap scan.
+Lets kick it off with the same thing we always start with. A good old nmap scan.
 
 ```
 nmap -sC -sV $TARGETIP -oN nmap.log
