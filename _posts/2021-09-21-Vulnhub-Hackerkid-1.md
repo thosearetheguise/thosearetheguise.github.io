@@ -169,7 +169,7 @@ dig @$TARGETIP
 ;; WHEN: Thu Aug 26 12:43:40 AEST 2021
 ;; MSG SIZE  rcvd: 56
 ```
-Running a standard DIG command against our target IP address returns a cookie value which is unexpected.
+Running a standard `dig` command against our target IP address returns a cookie value which is unexpected.
 Lets try a dig using the domain info from our page21 site.
 
 ```
