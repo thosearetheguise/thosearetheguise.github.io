@@ -145,7 +145,7 @@ It looks like there is some extra text at the bottom of the page.
 
 ![image3.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE3.png)
 
-There have been a lot of hints to look at [DIG](https://linux.die.net/man/1/dig) so let’s go ahead and do that.
+Another hint to look at [DIG](https://linux.die.net/man/1/dig) so let’s go ahead and do that.
 
 
 ```
