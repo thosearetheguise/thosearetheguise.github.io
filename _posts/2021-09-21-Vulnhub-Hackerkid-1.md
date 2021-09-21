@@ -140,7 +140,7 @@ Processed Requests: 5000
 Filtered Requests: 4999
 Requests/sec.: 911.3057
 ```
-And we get back a hit on page_no=21. Lets browse to it and check it out.
+We use the `--hh 3654` argument to hide any responses with a length of 3654 characters, and we get back a hit on page_no=21. Lets browse to it and check it out.
 It looks like there is some extra text at the bottom of the page.
 
 ![image3.png]({{site.baseurl}}/Images/vb-hackerkid/IMAGE3.png)
