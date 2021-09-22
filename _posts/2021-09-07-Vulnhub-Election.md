@@ -8,7 +8,7 @@ tags: ctf vulnhub election
 Hello all. We have another day and another vuln machine to crack.
 Today we are looking at [Election](https://www.vulnhub.com/entry/election-1,503/) (Medium difficulty)
 
-Also make sure to check out the [VOD](https://www.youtube.com/channel/UCBE5zF0VuDwn2-cAMNBJvkA) on youtube if you missed the livestream. :)
+Also make sure to check out the [VOD](https://www.youtube.com/watch?v=HsDiqKamZP0) on youtube if you missed the livestream. :)
 
 ## Prep:
 - Get your VMs a running (Kali and _the target_)
